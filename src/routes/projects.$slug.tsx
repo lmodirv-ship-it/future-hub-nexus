@@ -42,6 +42,9 @@ const glowMap = {
 function ProjectDetail() {
   const { project } = Route.useLoaderData() as { project: NexusProject };
   const Icon = project.icon;
+  const favicon = project.url !== "#"
+    ? `https://www.google.com/s2/favicons?domain=${new URL(project.url).hostname}&sz=256`
+    : null;
   const related = PROJECTS.filter((p) => p.category === project.category && p.id !== project.id).slice(0, 3);
 
   return (
@@ -55,7 +58,11 @@ function ProjectDetail() {
         <div className={`absolute -top-32 -left-32 h-64 w-64 rounded-full bg-gradient-to-br ${glowMap[project.glow]} opacity-30 blur-3xl`} />
         <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start">
           <div className={`flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${glowMap[project.glow]} text-background neon-glow`}>
-            <Icon className="h-10 w-10" />
+            {favicon ? (
+              <img src={favicon} alt={`${project.nameAr} logo`} className="h-12 w-12 rounded-lg object-contain" />
+            ) : (
+              <Icon className="h-10 w-10" />
+            )}
           </div>
           <div className="flex-1">
             <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-muted-foreground">
