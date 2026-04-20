@@ -11,6 +11,9 @@ const glowMap = {
 
 export function ProjectCard({ project, index = 0 }: { project: NexusProject; index?: number }) {
   const Icon = project.icon;
+  const favicon = project.url !== "#"
+    ? `https://www.google.com/s2/favicons?domain=${new URL(project.url).hostname}&sz=128`
+    : null;
   return (
     <article
       className="glass card-hover group relative overflow-hidden rounded-2xl p-6 animate-float"
@@ -23,7 +26,19 @@ export function ProjectCard({ project, index = 0 }: { project: NexusProject; ind
         <div
           className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${glowMap[project.glow]} text-background shadow-lg`}
         >
-          <Icon className="h-6 w-6" />
+          {favicon ? (
+            <img
+              src={favicon}
+              alt={`${project.nameAr} logo`}
+              className="h-7 w-7 rounded-md object-contain"
+              loading="lazy"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = "none";
+              }}
+            />
+          ) : (
+            <Icon className="h-6 w-6" />
+          )}
         </div>
         <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-muted-foreground">
           {project.categoryLabel}
