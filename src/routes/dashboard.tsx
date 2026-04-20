@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PROJECTS, CATEGORIES } from "@/data/projects";
 import { Activity, Layers, Zap, Globe } from "lucide-react";
+import { AdminGuard } from "@/components/nexus/AdminGuard";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -15,6 +16,14 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function Dashboard() {
+  return (
+    <AdminGuard>
+      <DashboardInner />
+    </AdminGuard>
+  );
+}
+
+function DashboardInner() {
   const active = PROJECTS.filter((p) => p.url !== "#").length;
   const stats = [
     { icon: Layers, label: "إجمالي المشاريع", value: PROJECTS.length, color: "violet" },

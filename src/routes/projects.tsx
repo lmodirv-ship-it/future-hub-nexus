@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ProjectGrid } from "@/components/nexus/ProjectGrid";
+import { AdminGuard } from "@/components/nexus/AdminGuard";
 
 export const Route = createFileRoute("/projects")({
   head: () => ({
@@ -14,6 +15,14 @@ export const Route = createFileRoute("/projects")({
 });
 
 function ProjectsPage() {
+  return (
+    <AdminGuard>
+      <ProjectsInner />
+    </AdminGuard>
+  );
+}
+
+function ProjectsInner() {
   return (
     <section className="relative mx-auto max-w-7xl px-6 pb-20 pt-32">
       <div className="mb-12 text-center">
