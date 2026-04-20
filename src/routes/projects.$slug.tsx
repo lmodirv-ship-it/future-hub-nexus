@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowRight, ExternalLink, Check } from "lucide-react";
-import { getProjectBySlug, PROJECTS } from "@/data/projects";
+import { getProjectBySlug, PROJECTS, type NexusProject } from "@/data/projects";
 
 export const Route = createFileRoute("/projects/$slug")({
   loader: ({ params }) => {
@@ -40,7 +40,7 @@ const glowMap = {
 } as const;
 
 function ProjectDetail() {
-  const { project } = Route.useLoaderData();
+  const { project } = Route.useLoaderData() as { project: NexusProject };
   const Icon = project.icon;
   const related = PROJECTS.filter((p) => p.category === project.category && p.id !== project.id).slice(0, 3);
 
