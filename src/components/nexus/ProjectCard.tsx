@@ -31,7 +31,8 @@ export function ProjectCard({ project, index = 0 }: { project: NexusProject; ind
               src={favicon}
               alt={`${project.nameAr} logo`}
               className="h-7 w-7 rounded-md object-contain"
-              loading="lazy"
+              loading={index < 4 ? "eager" : "lazy"}
+              decoding="async"
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).style.display = "none";
               }}
