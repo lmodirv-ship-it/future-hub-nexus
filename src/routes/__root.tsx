@@ -55,6 +55,10 @@ export const Route = createRootRoute({
         href: "https://fonts.googleapis.com",
       },
       {
+        rel: "preconnect",
+        href: "https://www.google.com",
+      },
+      {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700;900&display=swap",
       },
