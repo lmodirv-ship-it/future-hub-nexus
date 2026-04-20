@@ -1,5 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { Sparkles, LayoutDashboard, Briefcase, Info, Mail, Wrench } from "lucide-react";
+import { Sparkles, LayoutDashboard, Briefcase, Info, Mail, Wrench, LogIn, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
+import { isAdminEmail } from "@/lib/admin";
 
 const links = [
   { to: "/", label: "الرئيسية", icon: Sparkles },
@@ -11,6 +14,8 @@ const links = [
 ] as const;
 
 export function NavBar() {
+  const { user } = useAuth();
+  const isAdmin = isAdminEmail(user?.email);
   return (
     <header className="fixed top-4 left-1/2 z-50 w-[min(1100px,94vw)] -translate-x-1/2">
       <nav className="glass-strong flex items-center justify-between rounded-2xl px-4 py-2.5">
@@ -36,12 +41,21 @@ export function NavBar() {
             </li>
           ))}
         </ul>
-        <a
-          href="#contact"
-          className="hidden rounded-lg bg-gradient-to-r from-[oklch(0.75_0.2_295)] to-[oklch(0.7_0.28_330)] px-4 py-2 text-sm font-medium text-background neon-glow transition-transform hover:scale-105 sm:block"
-        >
-          ابدأ الآن
-        </a>
+        {isAdmin ? (
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="hidden items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-white/10 sm:flex"
+          >
+            <LogOut className="h-4 w-4" /> خروج
+          </button>
+        ) : (
+          <Link
+            to="/login"
+            className="hidden items-center gap-1.5 rounded-lg bg-gradient-to-r from-[oklch(0.75_0.2_295)] to-[oklch(0.7_0.28_330)] px-4 py-2 text-sm font-medium text-background neon-glow transition-transform hover:scale-105 sm:flex"
+          >
+            <LogIn className="h-4 w-4" /> دخول المدير
+          </Link>
+        )}
       </nav>
     </header>
   );

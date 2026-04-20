@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PROJECTS } from "@/data/projects";
 import { Check } from "lucide-react";
+import { AdminGuard } from "@/components/nexus/AdminGuard";
 
 export const Route = createFileRoute("/services")({
   head: () => ({
@@ -22,6 +23,14 @@ const glowMap = {
 } as const;
 
 function ServicesPage() {
+  return (
+    <AdminGuard>
+      <ServicesInner />
+    </AdminGuard>
+  );
+}
+
+function ServicesInner() {
   return (
     <section className="relative mx-auto max-w-7xl px-6 pb-20 pt-32">
       <div className="mb-12 text-center">
