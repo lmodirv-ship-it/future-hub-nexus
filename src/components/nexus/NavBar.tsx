@@ -2,12 +2,12 @@ import { Link } from "@tanstack/react-router";
 import { Sparkles, LayoutDashboard, Briefcase, Info, Mail, Wrench, LogIn, LogOut, Languages } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { isAdminEmail } from "@/lib/admin";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 import { useI18n } from "@/lib/i18n";
 
 export function NavBar() {
   const { user } = useAuth();
-  const isAdmin = isAdminEmail(user?.email);
+  const { isAdmin } = useIsAdmin();
   const { lang, setLang, t } = useI18n();
   const toggleLang = () => setLang(lang === "ar" ? "en" : "ar");
   const links = [

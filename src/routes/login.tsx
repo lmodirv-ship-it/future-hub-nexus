@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
-import { isAdminEmail, ADMIN_EMAIL } from "@/lib/admin";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 import { Sparkles, LogIn, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
@@ -17,20 +17,21 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
+  const { isAdmin, loading } = useIsAdmin();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!loading && user) {
-      if (isAdminEmail(user.email)) navigate({ to: "/admin" });
-      else {
-        setError(`هذا الحساب (${user.email}) ليس مديراً. مسموح فقط: ${ADMIN_EMAIL}`);
-        supabase.auth.signOut();
-      }
+    if (loading || !user) return;
+    if (isAdmin) {
+      navigate({ to: "/admin" });
+    } else {
+      setError(`هذا الحساب (${user.email}) ليس مديراً.`);
+      supabase.auth.signOut();
     }
-  }, [user, loading, navigate]);
+  }, [user, isAdmin, loading, navigate]);
 
   async function handleGoogle() {
     setBusy(true);

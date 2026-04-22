@@ -1,17 +1,16 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { useAuth } from "@/hooks/use-auth";
-import { isAdminEmail } from "@/lib/admin";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 
 export function AdminGuard({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { isAdmin, loading } = useIsAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !isAdminEmail(user?.email)) {
+    if (!loading && !isAdmin) {
       navigate({ to: "/login" });
     }
-  }, [loading, user, navigate]);
+  }, [loading, isAdmin, navigate]);
 
   if (loading) {
     return (
@@ -22,6 +21,6 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  if (!isAdminEmail(user?.email)) return null;
+  if (!isAdmin) return null;
   return <>{children}</>;
 }
