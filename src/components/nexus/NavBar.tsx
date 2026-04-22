@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Sparkles, LayoutDashboard, Briefcase, Info, Mail, Wrench, LogIn, LogOut, Languages } from "lucide-react";
+import { Sparkles, LayoutDashboard, Briefcase, Info, Mail, Wrench, LogIn, LogOut, Languages, Tag, Store, Activity } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin } from "@/hooks/use-is-admin";
@@ -13,9 +13,10 @@ export function NavBar() {
   const links = [
     { to: "/", label: t("nav.home"), icon: Sparkles },
     { to: "/projects", label: t("nav.projects"), icon: Briefcase },
+    { to: "/pricing", label: lang === "ar" ? "الأسعار" : "Pricing", icon: Tag },
+    { to: "/marketplace", label: lang === "ar" ? "السوق" : "Marketplace", icon: Store },
+    { to: "/monitor", label: lang === "ar" ? "مراقبة" : "Monitor", icon: Activity },
     { to: "/services", label: t("nav.services"), icon: Wrench },
-    { to: "/admin", label: t("nav.admin"), icon: LayoutDashboard },
-    { to: "/about", label: t("nav.about"), icon: Info },
     { to: "/contact", label: t("nav.contact"), icon: Mail },
   ] as const;
 
