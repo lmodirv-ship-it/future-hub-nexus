@@ -7,7 +7,7 @@ import { useI18n } from "@/lib/i18n";
 
 export function NavBar() {
   const { user } = useAuth();
-  const isAdmin = isAdminEmail(user?.email);
+  const { isAdmin } = useIsAdmin();
   const { lang, setLang, t } = useI18n();
   const toggleLang = () => setLang(lang === "ar" ? "en" : "ar");
   const links = [
