@@ -70,6 +70,114 @@ export type Database = {
           },
         ]
       }
+      monitored_sites: {
+        Row: {
+          alert_email: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          is_up: boolean | null
+          last_checked_at: string | null
+          last_response_time_ms: number | null
+          last_status_code: number | null
+          name: string
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          alert_email?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_up?: boolean | null
+          last_checked_at?: string | null
+          last_response_time_ms?: number | null
+          last_status_code?: number | null
+          name: string
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          alert_email?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_up?: boolean | null
+          last_checked_at?: string | null
+          last_response_time_ms?: number | null
+          last_status_code?: number | null
+          name?: string
+          updated_at?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      plans: {
+        Row: {
+          check_interval_minutes: number
+          created_at: string
+          description_ar: string | null
+          description_en: string | null
+          features: Json
+          id: string
+          interval: string
+          is_active: boolean
+          is_featured: boolean
+          max_sites: number
+          name_ar: string
+          name_en: string
+          paddle_price_id: string | null
+          price_mad_cents: number
+          price_usd_cents: number
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          check_interval_minutes?: number
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          features?: Json
+          id?: string
+          interval?: string
+          is_active?: boolean
+          is_featured?: boolean
+          max_sites?: number
+          name_ar: string
+          name_en: string
+          paddle_price_id?: string | null
+          price_mad_cents?: number
+          price_usd_cents?: number
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          check_interval_minutes?: number
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          features?: Json
+          id?: string
+          interval?: string
+          is_active?: boolean
+          is_featured?: boolean
+          max_sites?: number
+          name_ar?: string
+          name_en?: string
+          paddle_price_id?: string | null
+          price_mad_cents?: number
+          price_usd_cents?: number
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       project_checks: {
         Row: {
           checked_at: string
@@ -217,6 +325,219 @@ export type Database = {
           visit_count?: number
         }
         Relationships: []
+      }
+      service_requests: {
+        Row: {
+          admin_notes: string | null
+          budget_range: string | null
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          phone: string | null
+          service_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          budget_range?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          phone?: string | null
+          service_type: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          budget_range?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string | null
+          service_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          id: string
+          paddle_customer_id: string | null
+          paddle_subscription_id: string | null
+          plan_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
+          plan_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
+          plan_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      template_purchases: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          download_expires_at: string | null
+          download_token: string | null
+          id: string
+          paddle_transaction_id: string | null
+          status: string
+          template_id: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          currency?: string
+          download_expires_at?: string | null
+          download_token?: string | null
+          id?: string
+          paddle_transaction_id?: string | null
+          status?: string
+          template_id: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          download_expires_at?: string | null
+          download_token?: string | null
+          id?: string
+          paddle_transaction_id?: string | null
+          status?: string
+          template_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_purchases_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      templates: {
+        Row: {
+          category: string
+          cover_image: string | null
+          created_at: string
+          demo_url: string | null
+          description_ar: string | null
+          description_en: string | null
+          download_count: number
+          features: Json
+          id: string
+          is_published: boolean
+          paddle_price_id: string | null
+          price_mad_cents: number
+          price_usd_cents: number
+          slug: string
+          sort_order: number
+          source_project_id: string | null
+          tech_stack: Json
+          title_ar: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          cover_image?: string | null
+          created_at?: string
+          demo_url?: string | null
+          description_ar?: string | null
+          description_en?: string | null
+          download_count?: number
+          features?: Json
+          id?: string
+          is_published?: boolean
+          paddle_price_id?: string | null
+          price_mad_cents?: number
+          price_usd_cents?: number
+          slug: string
+          sort_order?: number
+          source_project_id?: string | null
+          tech_stack?: Json
+          title_ar: string
+          title_en: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          cover_image?: string | null
+          created_at?: string
+          demo_url?: string | null
+          description_ar?: string | null
+          description_en?: string | null
+          download_count?: number
+          features?: Json
+          id?: string
+          is_published?: boolean
+          paddle_price_id?: string | null
+          price_mad_cents?: number
+          price_usd_cents?: number
+          slug?: string
+          sort_order?: number
+          source_project_id?: string | null
+          tech_stack?: Json
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "templates_source_project_id_fkey"
+            columns: ["source_project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

@@ -5,6 +5,7 @@ import { NavBar } from "@/components/nexus/NavBar";
 import { Footer } from "@/components/nexus/Footer";
 import { AuroraBackground } from "@/components/nexus/AuroraBackground";
 import { I18nProvider } from "@/lib/i18n";
+import { CurrencyProvider } from "@/lib/currency";
 
 function NotFoundComponent() {
   return (
@@ -87,12 +88,14 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   return (
     <I18nProvider>
-      <AuroraBackground />
-      <NavBar />
-      <main className="relative">
-        <Outlet />
-      </main>
-      <Footer />
+      <CurrencyProvider>
+        <AuroraBackground />
+        <NavBar />
+        <main className="relative">
+          <Outlet />
+        </main>
+        <Footer />
+      </CurrencyProvider>
     </I18nProvider>
   );
 }

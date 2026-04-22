@@ -11,6 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ProjectsRouteImport } from './routes/projects'
+import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as MonitorRouteImport } from './routes/monitor'
+import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -18,9 +21,11 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectsSlugRouteImport } from './routes/projects.$slug'
+import { Route as MarketplaceSlugRouteImport } from './routes/marketplace.$slug'
 import { Route as AdminVisitsRouteImport } from './routes/admin.visits'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminProjectsRouteImport } from './routes/admin.projects'
+import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as AdminChecksRouteImport } from './routes/admin.checks'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as ApiPublicCronCheckProjectsRouteImport } from './routes/api.public.cron.check-projects'
@@ -33,6 +38,21 @@ const ServicesRoute = ServicesRouteImport.update({
 const ProjectsRoute = ProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MonitorRoute = MonitorRouteImport.update({
+  id: '/monitor',
+  path: '/monitor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceRoute = MarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -70,6 +90,11 @@ const ProjectsSlugRoute = ProjectsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ProjectsRoute,
 } as any)
+const MarketplaceSlugRoute = MarketplaceSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
 const AdminVisitsRoute = AdminVisitsRouteImport.update({
   id: '/visits',
   path: '/visits',
@@ -83,6 +108,11 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
 const AdminProjectsRoute = AdminProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLeadsRoute = AdminLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminChecksRoute = AdminChecksRouteImport.update({
@@ -109,13 +139,18 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
+  '/monitor': typeof MonitorRoute
+  '/pricing': typeof PricingRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/services': typeof ServicesRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
+  '/admin/leads': typeof AdminLeadsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
@@ -126,13 +161,18 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
+  '/monitor': typeof MonitorRoute
+  '/pricing': typeof PricingRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/services': typeof ServicesRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
+  '/admin/leads': typeof AdminLeadsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
@@ -144,13 +184,18 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
+  '/monitor': typeof MonitorRoute
+  '/pricing': typeof PricingRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/services': typeof ServicesRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
+  '/admin/leads': typeof AdminLeadsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
@@ -163,13 +208,18 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/login'
+    | '/marketplace'
+    | '/monitor'
+    | '/pricing'
     | '/projects'
     | '/services'
     | '/admin/alerts'
     | '/admin/checks'
+    | '/admin/leads'
     | '/admin/projects'
     | '/admin/settings'
     | '/admin/visits'
+    | '/marketplace/$slug'
     | '/projects/$slug'
     | '/api/public/cron/check-projects'
   fileRoutesByTo: FileRoutesByTo
@@ -180,13 +230,18 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/login'
+    | '/marketplace'
+    | '/monitor'
+    | '/pricing'
     | '/projects'
     | '/services'
     | '/admin/alerts'
     | '/admin/checks'
+    | '/admin/leads'
     | '/admin/projects'
     | '/admin/settings'
     | '/admin/visits'
+    | '/marketplace/$slug'
     | '/projects/$slug'
     | '/api/public/cron/check-projects'
   id:
@@ -197,13 +252,18 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/login'
+    | '/marketplace'
+    | '/monitor'
+    | '/pricing'
     | '/projects'
     | '/services'
     | '/admin/alerts'
     | '/admin/checks'
+    | '/admin/leads'
     | '/admin/projects'
     | '/admin/settings'
     | '/admin/visits'
+    | '/marketplace/$slug'
     | '/projects/$slug'
     | '/api/public/cron/check-projects'
   fileRoutesById: FileRoutesById
@@ -215,6 +275,9 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
+  MarketplaceRoute: typeof MarketplaceRouteWithChildren
+  MonitorRoute: typeof MonitorRoute
+  PricingRoute: typeof PricingRoute
   ProjectsRoute: typeof ProjectsRouteWithChildren
   ServicesRoute: typeof ServicesRoute
   ApiPublicCronCheckProjectsRoute: typeof ApiPublicCronCheckProjectsRoute
@@ -234,6 +297,27 @@ declare module '@tanstack/react-router' {
       path: '/projects'
       fullPath: '/projects'
       preLoaderRoute: typeof ProjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/monitor': {
+      id: '/monitor'
+      path: '/monitor'
+      fullPath: '/monitor'
+      preLoaderRoute: typeof MonitorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace': {
+      id: '/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -285,6 +369,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsSlugRouteImport
       parentRoute: typeof ProjectsRoute
     }
+    '/marketplace/$slug': {
+      id: '/marketplace/$slug'
+      path: '/$slug'
+      fullPath: '/marketplace/$slug'
+      preLoaderRoute: typeof MarketplaceSlugRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
     '/admin/visits': {
       id: '/admin/visits'
       path: '/visits'
@@ -304,6 +395,13 @@ declare module '@tanstack/react-router' {
       path: '/projects'
       fullPath: '/admin/projects'
       preLoaderRoute: typeof AdminProjectsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/leads': {
+      id: '/admin/leads'
+      path: '/leads'
+      fullPath: '/admin/leads'
+      preLoaderRoute: typeof AdminLeadsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/checks': {
@@ -333,6 +431,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAlertsRoute: typeof AdminAlertsRoute
   AdminChecksRoute: typeof AdminChecksRoute
+  AdminLeadsRoute: typeof AdminLeadsRoute
   AdminProjectsRoute: typeof AdminProjectsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminVisitsRoute: typeof AdminVisitsRoute
@@ -341,12 +440,25 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAlertsRoute: AdminAlertsRoute,
   AdminChecksRoute: AdminChecksRoute,
+  AdminLeadsRoute: AdminLeadsRoute,
   AdminProjectsRoute: AdminProjectsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminVisitsRoute: AdminVisitsRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface MarketplaceRouteChildren {
+  MarketplaceSlugRoute: typeof MarketplaceSlugRoute
+}
+
+const MarketplaceRouteChildren: MarketplaceRouteChildren = {
+  MarketplaceSlugRoute: MarketplaceSlugRoute,
+}
+
+const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
+  MarketplaceRouteChildren,
+)
 
 interface ProjectsRouteChildren {
   ProjectsSlugRoute: typeof ProjectsSlugRoute
@@ -367,6 +479,9 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
+  MarketplaceRoute: MarketplaceRouteWithChildren,
+  MonitorRoute: MonitorRoute,
+  PricingRoute: PricingRoute,
   ProjectsRoute: ProjectsRouteWithChildren,
   ServicesRoute: ServicesRoute,
   ApiPublicCronCheckProjectsRoute: ApiPublicCronCheckProjectsRoute,
