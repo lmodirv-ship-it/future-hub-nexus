@@ -10,7 +10,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/admin/leads")({
   component: () => (
     <AdminGuard>
-      <AdminLayout>
+      <AdminLayout title="طلبات الخدمات">
         <LeadsInner />
       </AdminLayout>
     </AdminGuard>
