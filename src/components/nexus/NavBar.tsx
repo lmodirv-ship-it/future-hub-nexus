@@ -1,40 +1,23 @@
 import { Link } from "@tanstack/react-router";
 import { Sparkles, LayoutDashboard, Briefcase, Info, Mail, Wrench, LogIn, LogOut, Languages } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { isAdminEmail } from "@/lib/admin";
-
-const links = [
-  { to: "/", label: "الرئيسية", icon: Sparkles },
-  { to: "/projects", label: "المشاريع", icon: Briefcase },
-  { to: "/services", label: "الخدمات", icon: Wrench },
-  { to: "/admin", label: "لوحة التحكم", icon: LayoutDashboard },
-  { to: "/about", label: "عن المنصة", icon: Info },
-  { to: "/contact", label: "تواصل", icon: Mail },
-] as const;
+import { useI18n } from "@/lib/i18n";
 
 export function NavBar() {
   const { user } = useAuth();
   const isAdmin = isAdminEmail(user?.email);
-  const [lang, setLang] = useState<"ar" | "en">("ar");
-
-  useEffect(() => {
-    const saved = (typeof window !== "undefined" && localStorage.getItem("lang")) as "ar" | "en" | null;
-    if (saved === "ar" || saved === "en") {
-      setLang(saved);
-      document.documentElement.lang = saved;
-      document.documentElement.dir = saved === "ar" ? "rtl" : "ltr";
-    }
-  }, []);
-
-  const toggleLang = () => {
-    const next = lang === "ar" ? "en" : "ar";
-    setLang(next);
-    localStorage.setItem("lang", next);
-    document.documentElement.lang = next;
-    document.documentElement.dir = next === "ar" ? "rtl" : "ltr";
-  };
+  const { lang, setLang, t } = useI18n();
+  const toggleLang = () => setLang(lang === "ar" ? "en" : "ar");
+  const links = [
+    { to: "/", label: t("nav.home"), icon: Sparkles },
+    { to: "/projects", label: t("nav.projects"), icon: Briefcase },
+    { to: "/services", label: t("nav.services"), icon: Wrench },
+    { to: "/admin", label: t("nav.admin"), icon: LayoutDashboard },
+    { to: "/about", label: t("nav.about"), icon: Info },
+    { to: "/contact", label: t("nav.contact"), icon: Mail },
+  ] as const;
 
   return (
     <header className="fixed top-4 left-1/2 z-50 w-[min(1100px,94vw)] -translate-x-1/2">
@@ -76,14 +59,14 @@ export function NavBar() {
             onClick={() => supabase.auth.signOut()}
             className="hidden items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-white/10 sm:flex"
           >
-            <LogOut className="h-4 w-4" /> خروج
+            <LogOut className="h-4 w-4" /> {t("nav.logout")}
           </button>
           ) : (
           <Link
             to="/login"
             className="hidden items-center gap-1.5 rounded-lg bg-gradient-to-r from-[oklch(0.75_0.2_295)] to-[oklch(0.7_0.28_330)] px-4 py-2 text-sm font-medium text-background neon-glow transition-transform hover:scale-105 sm:flex"
           >
-            <LogIn className="h-4 w-4" /> دخول المدير
+            <LogIn className="h-4 w-4" /> {t("nav.login")}
           </Link>
           )}
         </div>
