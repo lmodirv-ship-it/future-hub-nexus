@@ -23,6 +23,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminProjectsRouteImport } from './routes/admin.projects'
 import { Route as AdminChecksRouteImport } from './routes/admin.checks'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
+import { Route as ApiPublicCronCheckProjectsRouteImport } from './routes/api.public.cron.check-projects'
 
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
@@ -94,6 +95,12 @@ const AdminAlertsRoute = AdminAlertsRouteImport.update({
   path: '/alerts',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicCronCheckProjectsRoute =
+  ApiPublicCronCheckProjectsRouteImport.update({
+    id: '/api/public/cron/check-projects',
+    path: '/api/public/cron/check-projects',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -126,6 +134,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -143,6 +152,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/visits'
     | '/projects/$slug'
+    | '/api/public/cron/check-projects'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -177,6 +188,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/visits'
     | '/projects/$slug'
+    | '/api/public/cron/check-projects'
   id:
     | '__root__'
     | '/'
@@ -193,6 +205,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/visits'
     | '/projects/$slug'
+    | '/api/public/cron/check-projects'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -204,6 +217,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ProjectsRoute: typeof ProjectsRouteWithChildren
   ServicesRoute: typeof ServicesRoute
+  ApiPublicCronCheckProjectsRoute: typeof ApiPublicCronCheckProjectsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -306,6 +320,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAlertsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/cron/check-projects': {
+      id: '/api/public/cron/check-projects'
+      path: '/api/public/cron/check-projects'
+      fullPath: '/api/public/cron/check-projects'
+      preLoaderRoute: typeof ApiPublicCronCheckProjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -348,6 +369,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ProjectsRoute: ProjectsRouteWithChildren,
   ServicesRoute: ServicesRoute,
+  ApiPublicCronCheckProjectsRoute: ApiPublicCronCheckProjectsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
