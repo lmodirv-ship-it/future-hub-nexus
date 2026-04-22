@@ -20,6 +20,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectsSlugRouteImport } from './routes/projects.$slug'
+import { Route as MarketplaceSlugRouteImport } from './routes/marketplace.$slug'
 import { Route as AdminVisitsRouteImport } from './routes/admin.visits'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminProjectsRouteImport } from './routes/admin.projects'
@@ -82,6 +83,11 @@ const ProjectsSlugRoute = ProjectsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ProjectsRoute,
 } as any)
+const MarketplaceSlugRoute = MarketplaceSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
 const AdminVisitsRoute = AdminVisitsRouteImport.update({
   id: '/visits',
   path: '/visits',
@@ -121,7 +127,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/marketplace': typeof MarketplaceRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/services': typeof ServicesRoute
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
@@ -140,7 +147,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/marketplace': typeof MarketplaceRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/services': typeof ServicesRoute
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
@@ -160,7 +168,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/marketplace': typeof MarketplaceRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/services': typeof ServicesRoute
@@ -169,6 +177,7 @@ export interface FileRoutesById {
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/admin/projects'
     | '/admin/settings'
     | '/admin/visits'
+    | '/marketplace/$slug'
     | '/projects/$slug'
     | '/api/public/cron/check-projects'
   fileRoutesByTo: FileRoutesByTo
@@ -209,6 +219,7 @@ export interface FileRouteTypes {
     | '/admin/projects'
     | '/admin/settings'
     | '/admin/visits'
+    | '/marketplace/$slug'
     | '/projects/$slug'
     | '/api/public/cron/check-projects'
   id:
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/admin/projects'
     | '/admin/settings'
     | '/admin/visits'
+    | '/marketplace/$slug'
     | '/projects/$slug'
     | '/api/public/cron/check-projects'
   fileRoutesById: FileRoutesById
@@ -239,7 +251,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
-  MarketplaceRoute: typeof MarketplaceRoute
+  MarketplaceRoute: typeof MarketplaceRouteWithChildren
   PricingRoute: typeof PricingRoute
   ProjectsRoute: typeof ProjectsRouteWithChildren
   ServicesRoute: typeof ServicesRoute
@@ -325,6 +337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsSlugRouteImport
       parentRoute: typeof ProjectsRoute
     }
+    '/marketplace/$slug': {
+      id: '/marketplace/$slug'
+      path: '/$slug'
+      fullPath: '/marketplace/$slug'
+      preLoaderRoute: typeof MarketplaceSlugRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
     '/admin/visits': {
       id: '/admin/visits'
       path: '/visits'
@@ -388,6 +407,18 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface MarketplaceRouteChildren {
+  MarketplaceSlugRoute: typeof MarketplaceSlugRoute
+}
+
+const MarketplaceRouteChildren: MarketplaceRouteChildren = {
+  MarketplaceSlugRoute: MarketplaceSlugRoute,
+}
+
+const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
+  MarketplaceRouteChildren,
+)
+
 interface ProjectsRouteChildren {
   ProjectsSlugRoute: typeof ProjectsSlugRoute
 }
@@ -407,7 +438,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
-  MarketplaceRoute: MarketplaceRoute,
+  MarketplaceRoute: MarketplaceRouteWithChildren,
   PricingRoute: PricingRoute,
   ProjectsRoute: ProjectsRouteWithChildren,
   ServicesRoute: ServicesRoute,
