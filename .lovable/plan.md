@@ -1,124 +1,145 @@
 
-# تحويل المشروع إلى نظام حقيقي بالكامل
+# خطة تحويل الموقع إلى مشروع ناجح يدرّ مداخيل (متوافق مع المغرب 🇲🇦)
 
-## الوضع الحالي (تشخيص)
+## ملاحظة مهمة عن المدفوعات في المغرب
 
-بعد فحص المشروع، الواقع مختلف قليلاً عما ذُكر:
+Stripe **غير مدعوم رسمياً للبائعين في المغرب** (لا يمكن فتح حساب Stripe بـ ID مغربي). لكن **Paddle مدعوم بالكامل في المغرب** لأنه يعمل كـ **Merchant of Record** — أنت تبيع لـ Paddle، و Paddle يبيع للعميل النهائي ويحوّل لك الأرباح بالـ USD/EUR إلى:
+- حساب بنكي مغربي (تحويل دولي SWIFT)
+- أو **Payoneer** / **Wise** (الأسهل والأسرع للمغاربة)
 
-✅ **موجود فعلاً وحقيقي:**
-- جدول `projects` في قاعدة البيانات (مع 14 عمود + RLS)
-- جدول `project_checks` (سجل الفحوصات)
-- جدول `project_visits` (إحصائيات الزيارات)
-- 4 دوال SQL: `is_admin`, `get_dashboard_stats`, `log_project_visit`, `update_updated_at_column`
-- مصادقة Google OAuth حقيقية عبر `lovable.auth.signInWithOAuth` + Supabase Auth
-- `useProjects` hook يقرأ من Supabase مع Realtime
-- `AdminGuard` يتحقق من البريد عبر `auth.users` الحقيقي
-- Server function `checkAllProjects` تفحص المواقع فعلياً
-
-❌ **الناقص فعلاً (Mock / فارغ):**
-1. **جدول `projects` فارغ** — البيانات الـ14 موجودة فقط في `src/data/projects.ts` (ثابتة)
-2. **صفحات Admin (checks/visits/alerts/settings) تعرض UI فقط** بدون استعلامات حقيقية كاملة
-3. **لا يوجد جدول `alerts`** للتنبيهات
-4. **لا يوجد جدول `admin_settings`** للإعدادات
-5. **الفحص التلقائي يدوي فقط** — لا cron job
-6. **تسجيل الزيارات `log_project_visit` غير مستدعى** من الواجهة
-7. **نظام الأدوار** يعتمد على بريد ثابت (`is_admin` يقارن بـ `lmodirv@gmail.com`) بدل جدول `user_roles`
+**القرار**: نستخدم **Paddle** كبوابة دفع رئيسية. بديل مغربي محلي: **CMI** (للعملاء المغاربة بالدرهم) — يمكن إضافته لاحقاً كقناة ثانية.
 
 ---
 
-## الخطة التنفيذية
+## الفكرة الإستراتيجية
 
-### 1. ترحيل البيانات الـ14 من الكود إلى قاعدة البيانات
-- `INSERT` للمشاريع الـ14 من `src/data/projects.ts` إلى جدول `projects` الحقيقي
-- حذف `src/data/projects.ts` (أو إبقاؤه فقط كـ seed reference)
-- `ProjectGrid` و `ProjectCard` يقرآن من Supabase مباشرة (موجود مسبقاً)
-
-### 2. إنشاء الجداول الناقصة (Migration)
-
-**جدول `user_roles`** (بديل آمن للبريد الثابت):
-- `app_role` enum: `admin`, `viewer`
-- جدول `user_roles (user_id, role)` + RLS
-- تحديث دالة `is_admin()` لتستخدم `has_role()` بدل مقارنة البريد
-- زرع المستخدم الحالي كـ admin
-
-**جدول `alerts`**:
-- `id, project_id, type (down/slow/ssl), severity, message, is_read, created_at`
-- RLS: admin فقط
-- Trigger: عند `is_up=false` في `project_checks` يُنشئ تنبيه تلقائياً
-
-**جدول `admin_settings`** (key-value):
-- `key, value (jsonb), updated_at`
-- مفاتيح أولية: `check_interval_minutes`, `alert_email`, `slow_threshold_ms`
-
-### 3. ربط صفحات Admin بالبيانات الحقيقية
-
-| الصفحة | المصدر الحقيقي |
-|--------|----------------|
-| `/admin` | `get_dashboard_stats()` RPC (موجودة) |
-| `/admin/projects` | `projects` table CRUD (موجود) |
-| `/admin/checks` | `project_checks` SELECT مع pagination |
-| `/admin/visits` | `project_visits` + chart زمني |
-| `/admin/alerts` | `alerts` table + mark as read |
-| `/admin/settings` | `admin_settings` upsert |
-
-### 4. تفعيل تسجيل الزيارات الحقيقي
-- في `ProjectCard` عند النقر: استدعاء RPC `log_project_visit(project_id)`
-- زيادة `visit_count` تلقائياً (الدالة موجودة)
-
-### 5. الفحص التلقائي الدوري
-- Server route عام: `/api/public/cron/check-projects`
-- Verification عبر `CRON_SECRET` header
-- إعداد pg_cron داخل Supabase لاستدعائه كل 15 دقيقة (حسب `admin_settings.check_interval_minutes`)
-
-### 6. توحيد المصادقة
-- إزالة الاعتماد على `ADMIN_EMAIL` الثابت في `src/lib/admin.ts`
-- استبداله بـ hook `useIsAdmin()` يستدعي RPC `is_admin()`
-- `AdminGuard` يستخدم الـ hook الجديد
+تحويل **Future Hub Nexus** من كتالوج إلى **منصة SaaS عربية** بأربع قنوات دخل، كلها تعمل عبر Paddle.
 
 ---
 
-## التفاصيل التقنية
+## مصادر الدخل (4 قنوات)
 
-**Migrations مطلوبة:**
-```sql
--- 1. user_roles + has_role
-CREATE TYPE app_role AS ENUM ('admin','viewer');
-CREATE TABLE user_roles (...);
-CREATE FUNCTION has_role(_uid uuid, _role app_role) ...
--- إعادة تعريف is_admin() لاستخدام has_role
+### 1) خدمة "مراقبة المواقع" (الأهم — دخل متكرر MRR)
+نملك البنية أصلاً (`project_checks` + `alerts` + cron). نحوّلها لـ SaaS:
+- **Free**: موقع واحد، فحص كل ساعة
+- **Pro — 9$/شهر**: 10 مواقع، فحص كل 5 دقائق، تنبيهات Email
+- **Business — 29$/شهر**: 50 موقع، فحص كل دقيقة، تقارير، API، تنبيهات WhatsApp
 
--- 2. alerts + trigger
-CREATE TABLE alerts (...);
-CREATE FUNCTION create_alert_on_down() RETURNS trigger ...
-CREATE TRIGGER on_check_insert AFTER INSERT ON project_checks ...
+### 2) سوق القوالب (Marketplace) — دخل One-time
+بيع نسخ من مشاريعك الـ14 كقوالب جاهزة:
+- 19$ – 99$ لكل قالب
+- تسليم فوري عبر رابط download token موقّت
 
--- 3. admin_settings
-CREATE TABLE admin_settings (key text PK, value jsonb, ...);
-INSERT defaults;
+### 3) خدمات احترافية (Done-For-You) — Leads عالية القيمة
+- "أنشئ لي موقعاً" — 199$ – 999$
+- استشارة ساعة — 49$
+- نموذج طلب → جدول `service_requests` → لوحة `/admin/leads`
 
--- 4. seed user_roles بالبريد الحالي كـ admin
--- 5. seed projects بالـ14 مشروع
+### 4) رعاية / إعلانات (Sponsored Slots)
+- بطاقة مميزة في الصفحة الرئيسية — 49$/شهر
+- إدارة من `/admin/sponsorships`
+
+---
+
+## البنية التقنية
+
+### قاعدة البيانات (جداول جديدة + RLS)
+```text
+plans              (id, name, price_cents, currency, max_sites, check_interval_min, features jsonb)
+subscriptions      (id, user_id, plan_id, status, paddle_sub_id, current_period_end)
+monitored_sites    (id, user_id, url, name, is_up, last_checked_at)
+templates          (id, slug, title, description, price_cents, demo_url, source_url)
+template_purchases (id, user_id, template_id, paddle_txn_id, download_token, expires_at)
+service_requests   (id, name, email, service_type, budget, message, status)
+sponsorships       (id, project_id, starts_at, ends_at, amount_cents, sponsor_name)
 ```
 
-**Secrets جديدة:** `CRON_SECRET` (للحماية endpoint الفحص الدوري)
+### تكامل المدفوعات
+- استخدام أداة Lovable المدمجة `enable_paddle_payments` (لا تحتاج حساب Paddle شخصي للبدء — Lovable يدير الـ sandbox)
+- Edge Functions تلقائية: checkout, subscription, webhook
+- Webhook signature verification إجباري
+- عند الانتقال للـ live: تتطلب verification من Paddle (مدة 1-3 أيام)
 
-**ملفات ستُعدَّل/تُنشأ:**
-- جديد: `src/hooks/use-is-admin.ts`, `src/hooks/use-alerts.ts`, `src/hooks/use-checks.ts`, `src/hooks/use-visits.ts`, `src/hooks/use-settings.ts`
-- جديد: `src/routes/api.public.cron.check-projects.ts`
-- تعديل: `src/components/nexus/AdminGuard.tsx`, `src/lib/admin.ts`, `src/components/nexus/ProjectCard.tsx`
-- تعديل: `src/routes/admin.checks.tsx`, `admin.visits.tsx`, `admin.alerts.tsx`, `admin.settings.tsx`
-- حذف: `src/data/projects.ts` (بعد الترحيل)
+### المسارات الجديدة
+
+**عامة (تدر دخل):**
+- `/pricing` — الخطط الثلاثية
+- `/marketplace` + `/marketplace/$slug` — القوالب
+- `/monitor` — Landing لخدمة المراقبة
+- `/services` (تحديث) — نموذج طلب احترافي
+
+**لوحة المشترك `_authenticated`:**
+- `/app/sites` — إدارة المواقع المراقَبة
+- `/app/billing` — Customer Portal
+- `/app/downloads` — القوالب المُشتراة
+
+**إضافات Admin:**
+- `/admin/revenue` — MRR + إيرادات + funnel
+- `/admin/leads` — طلبات الخدمات
+- `/admin/templates` — إدارة القوالب
+- `/admin/sponsorships` — إدارة الرعاية
+
+### نظام المراقبة
+- cron الحالي يفحص `projects` (للعرض) — يبقى
+- cron جديد يفحص `monitored_sites` بحسب `plan.check_interval_min`
+- تنبيهات Email عبر **Resend** (متاح كـ connector)
+
+### SEO وجلب الزوار (مجاناً)
+- `/sitemap.xml` ديناميكي
+- JSON-LD Schema.org لكل قالب/مشروع
+- Open Graph + Twitter Card لكل route
+- صفحة `/blog` + `/blog/$slug` (مقالات في DB)
+- robots.txt
+
+### تحليلات
+- جدول `events` (page_view, pricing_view, checkout_start, purchase)
+- لوحة `/admin/revenue`: Visitors → Trial → Paid
 
 ---
 
-## النتيجة النهائية
+## مراحل التنفيذ
 
-- ✅ مصادقة Google حقيقية (موجودة أصلاً) + نظام أدوار قابل للتوسع
-- ✅ 14 مشروع في قاعدة بيانات حقيقية + قابلة للإضافة من لوحة التحكم
-- ✅ فحص حالة المواقع تلقائي كل X دقيقة
-- ✅ تنبيهات تلقائية عند تعطل أي موقع
-- ✅ إحصائيات زيارات حقيقية
-- ✅ إعدادات قابلة للتعديل من الواجهة
-- ✅ كل صفحات `/admin` تعرض بيانات حية من Supabase
+**المرحلة 1 — الدفع + Pricing (الأهم):**
+- تشغيل `recommend_payment_provider` ثم `enable_paddle_payments`
+- إنشاء `plans` + `subscriptions` + webhook handler
+- صفحة `/pricing` تعمل end-to-end (sandbox)
 
-هل أبدأ التنفيذ؟
+**المرحلة 2 — Marketplace:**
+- جداول `templates` + `template_purchases`
+- صفحات `/marketplace` + تفاصيل القالب + شراء + تسليم آمن
+- زرع 14 مشروع كقوالب أولية
+
+**المرحلة 3 — خدمة المراقبة:**
+- `monitored_sites` + cron منفصل + ربط حدود الخطة
+- صفحات `/monitor` + `/app/sites`
+
+**المرحلة 4 — الخدمات والـ Leads:**
+- `/services` form + `service_requests`
+- `/admin/leads`
+- إيميل تنبيه للأدمن (Resend)
+
+**المرحلة 5 — SEO + التحليلات + Blog:**
+- sitemap + JSON-LD + meta
+- `/admin/revenue` dashboard
+- `/blog` أساسي
+
+---
+
+## ما سأطلبه أثناء التنفيذ
+1. **تفعيل Paddle** (يتطلب **خطة Pro** على Lovable)
+2. **Resend connector** للإيميلات
+3. (اختياري) **Twilio** لتنبيهات WhatsApp في خطة Business
+4. أسعار الخطط النهائية (المقترح أعلاه قابل للتعديل)
+5. هل تريد أيضاً قناة دفع مغربية محلية (**CMI**) للعملاء المغاربة بالدرهم؟ يمكن إضافتها كمرحلة 6.
+
+---
+
+## النتيجة المتوقعة
+- 💰 دخل متكرر شهرياً (MRR) من اشتراكات المراقبة
+- 💵 دخل One-time من بيع القوالب
+- 📞 Pipeline من Leads عالية القيمة للخدمات
+- 🇲🇦 يعمل من المغرب بدون مشاكل (Paddle MoR)
+- 📈 SEO قوي يجلب trafic عضوي مجاني
+- 📊 لوحة تحكم تُظهر إيرادات حقيقية
+
+هل أبدأ بالمرحلة 1 (Paddle + Pricing)؟
