@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Sparkles, LayoutDashboard, Briefcase, Info, Mail, Wrench, LogIn, LogOut, Languages } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { isAdminEmail } from "@/lib/admin";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 import { useI18n } from "@/lib/i18n";
 
 export function NavBar() {
