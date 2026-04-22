@@ -167,7 +167,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_dashboard_stats: { Args: never; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
+      log_project_visit: { Args: { _project_id: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
