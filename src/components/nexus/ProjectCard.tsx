@@ -2,6 +2,11 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUpLeft, ExternalLink } from "lucide-react";
 import type { ProjectRow } from "@/hooks/use-projects";
 import { getIcon, GLOW_MAP, type GlowKey } from "@/lib/icon-map";
+import { supabase } from "@/integrations/supabase/client";
+
+function logVisit(projectId: string) {
+  supabase.rpc("log_project_visit", { _project_id: projectId }).then(() => {});
+}
 
 export function ProjectCard({ project, index = 0 }: { project: ProjectRow; index?: number }) {
   const Icon = getIcon(project.icon);
@@ -63,6 +68,7 @@ export function ProjectCard({ project, index = 0 }: { project: ProjectRow; index
             href={project.url}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => logVisit(project.id)}
             className={`flex items-center gap-1.5 rounded-lg bg-gradient-to-r ${GLOW_MAP[glow]} px-3 py-1.5 text-xs font-medium text-background transition-transform hover:scale-105`}
           >
             افتح
