@@ -9,7 +9,7 @@ const links = [
   { to: "/", label: "الرئيسية", icon: Sparkles },
   { to: "/projects", label: "المشاريع", icon: Briefcase },
   { to: "/services", label: "الخدمات", icon: Wrench },
-  { to: "/dashboard", label: "لوحة التحكم", icon: LayoutDashboard },
+  { to: "/admin", label: "لوحة التحكم", icon: LayoutDashboard },
   { to: "/about", label: "عن المنصة", icon: Info },
   { to: "/contact", label: "تواصل", icon: Mail },
 ] as const;

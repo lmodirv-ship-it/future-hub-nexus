@@ -36,7 +36,7 @@ export function HeroNexus() {
             <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
           </Link>
           <Link
-            to="/dashboard"
+            to="/admin"
             className="glass flex items-center gap-2 rounded-xl px-6 py-3 font-medium transition-colors hover:bg-white/10"
           >
             <Sparkles className="h-5 w-5 text-[oklch(0.85_0.18_200)]" />

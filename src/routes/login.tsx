@@ -24,7 +24,7 @@ function LoginPage() {
 
   useEffect(() => {
     if (!loading && user) {
-      if (isAdminEmail(user.email)) navigate({ to: "/dashboard" });
+      if (isAdminEmail(user.email)) navigate({ to: "/admin" });
       else {
         setError(`هذا الحساب (${user.email}) ليس مديراً. مسموح فقط: ${ADMIN_EMAIL}`);
         supabase.auth.signOut();
