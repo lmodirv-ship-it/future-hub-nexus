@@ -14,13 +14,160 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      project_checks: {
+        Row: {
+          checked_at: string
+          error_message: string | null
+          id: string
+          is_up: boolean
+          project_id: string
+          response_time_ms: number | null
+          status_code: number | null
+        }
+        Insert: {
+          checked_at?: string
+          error_message?: string | null
+          id?: string
+          is_up: boolean
+          project_id: string
+          response_time_ms?: number | null
+          status_code?: number | null
+        }
+        Update: {
+          checked_at?: string
+          error_message?: string | null
+          id?: string
+          is_up?: boolean
+          project_id?: string
+          response_time_ms?: number | null
+          status_code?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_checks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_visits: {
+        Row: {
+          count: number
+          created_at: string
+          id: string
+          project_id: string
+          visit_date: string
+        }
+        Insert: {
+          count?: number
+          created_at?: string
+          id?: string
+          project_id: string
+          visit_date?: string
+        }
+        Update: {
+          count?: number
+          created_at?: string
+          id?: string
+          project_id?: string
+          visit_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_visits_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          category: string
+          category_label: string
+          created_at: string
+          description: string | null
+          description_ar: string | null
+          glow: string | null
+          icon: string | null
+          id: string
+          is_featured: boolean
+          is_up: boolean | null
+          last_checked_at: string | null
+          last_response_time_ms: number | null
+          last_status_code: number | null
+          lovable_project_id: string | null
+          name: string
+          name_ar: string
+          owner_email: string | null
+          slug: string
+          sort_order: number
+          status: string
+          updated_at: string
+          url: string
+          visit_count: number
+        }
+        Insert: {
+          category?: string
+          category_label?: string
+          created_at?: string
+          description?: string | null
+          description_ar?: string | null
+          glow?: string | null
+          icon?: string | null
+          id?: string
+          is_featured?: boolean
+          is_up?: boolean | null
+          last_checked_at?: string | null
+          last_response_time_ms?: number | null
+          last_status_code?: number | null
+          lovable_project_id?: string | null
+          name: string
+          name_ar: string
+          owner_email?: string | null
+          slug: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+          url: string
+          visit_count?: number
+        }
+        Update: {
+          category?: string
+          category_label?: string
+          created_at?: string
+          description?: string | null
+          description_ar?: string | null
+          glow?: string | null
+          icon?: string | null
+          id?: string
+          is_featured?: boolean
+          is_up?: boolean | null
+          last_checked_at?: string | null
+          last_response_time_ms?: number | null
+          last_status_code?: number | null
+          lovable_project_id?: string | null
+          name?: string
+          name_ar?: string
+          owner_email?: string | null
+          slug?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+          url?: string
+          visit_count?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
