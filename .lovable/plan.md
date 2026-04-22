@@ -1,115 +1,124 @@
 
+# تحويل المشروع إلى نظام حقيقي بالكامل
 
-# منصة "Glass Nexus" — موقع زجاجي من المستقبل يجمع كل مشاريعك
+## الوضع الحالي (تشخيص)
 
-سأبني منصة واحدة موحدة تجمع جميع مشاريعك الـ 14 على Lovable في واجهة واحدة تبدو وكأنها من المستقبل: زجاج شفاف، إضاءات نيون، حركات سلسة، خلفيات متحركة ثلاثية الأبعاد. الموقع سيكون بمثابة "مركز التحكم" (Command Center) لكل أعمالك.
+بعد فحص المشروع، الواقع مختلف قليلاً عما ذُكر:
 
-## المشاريع التي سيتم تجميعها (14 مشروع)
+✅ **موجود فعلاً وحقيقي:**
+- جدول `projects` في قاعدة البيانات (مع 14 عمود + RLS)
+- جدول `project_checks` (سجل الفحوصات)
+- جدول `project_visits` (إحصائيات الزيارات)
+- 4 دوال SQL: `is_admin`, `get_dashboard_stats`, `log_project_visit`, `update_updated_at_column`
+- مصادقة Google OAuth حقيقية عبر `lovable.auth.signInWithOAuth` + Supabase Auth
+- `useProjects` hook يقرأ من Supabase مع Realtime
+- `AdminGuard` يتحقق من البريد عبر `auth.users` الحقيقي
+- Server function `checkAllProjects` تفحص المواقع فعلياً
 
-| # | المشروع | الفئة | الرابط |
-|---|---------|-------|--------|
-| 1 | AI Studio Vision | ذكاء اصطناعي / فيديو | hn-videoai |
-| 2 | AI Scene Studio | ذكاء اصطناعي / مشاهد | hn-aivideo |
-| 3 | hn-cima | سينما / ترفيه | hn-vi |
-| 4 | Souk-HN Express | تجارة إلكترونية | souk-hn |
-| 5 | Agency Hub Pro | عقارات / وكالات | hn-immobiler |
-| 6 | Profitable Ventures Hub | أعمال / استثمار | income-igniter-ide |
-| 7 | HN Driver | نقل / توصيل | smooth-route-guide |
-| 8 | Smart Solutions Hub | حلول ذكية | hn-gr |
-| 9 | Grand Tanger Print Studio | طباعة / تصميم | tangier-print-hub |
-| 10 | CarWashManager | خدمات سيارات | hn-carwash |
-| 11 | Remix CarWashManager | خدمات سيارات | wash-pal-app |
-| 12 | Create New Project | استوديو | studio-hn |
-| 13 | Domain Monitor | مراقبة نطاقات | — |
-| 14 | Cloud Harmony | سحابة | — |
+❌ **الناقص فعلاً (Mock / فارغ):**
+1. **جدول `projects` فارغ** — البيانات الـ14 موجودة فقط في `src/data/projects.ts` (ثابتة)
+2. **صفحات Admin (checks/visits/alerts/settings) تعرض UI فقط** بدون استعلامات حقيقية كاملة
+3. **لا يوجد جدول `alerts`** للتنبيهات
+4. **لا يوجد جدول `admin_settings`** للإعدادات
+5. **الفحص التلقائي يدوي فقط** — لا cron job
+6. **تسجيل الزيارات `log_project_visit` غير مستدعى** من الواجهة
+7. **نظام الأدوار** يعتمد على بريد ثابت (`is_admin` يقارن بـ `lmodirv@gmail.com`) بدل جدول `user_roles`
 
-## الهوية البصرية — "Glass from the Future"
+---
 
-- **خلفية**: أسود فضائي عميق (#05060A) مع طبقات Aurora متحركة (بنفسجي/سماوي/وردي) باستخدام CSS gradients + blur
-- **البطاقات**: زجاج حقيقي (`backdrop-filter: blur(24px)` + حدود نيون رفيعة + reflections داخلية)
-- **التوهج**: حواف نيون متغيرة الألوان عند التحويم (cyan → magenta → violet)
-- **حركات**: parallax عند التمرير، tilt 3D للبطاقات عند المرور بالماوس، شبكة نقاط متحركة في الخلفية
-- **الخط**: Inter للنصوص + Space Grotesk للعناوين، مع دعم RTL كامل للعربية
-- **اللغة**: عربية كاملة مع اتجاه RTL (الواجهة بلسان عربي مستقبلي)
+## الخطة التنفيذية
 
-## بنية الموقع (الصفحات)
+### 1. ترحيل البيانات الـ14 من الكود إلى قاعدة البيانات
+- `INSERT` للمشاريع الـ14 من `src/data/projects.ts` إلى جدول `projects` الحقيقي
+- حذف `src/data/projects.ts` (أو إبقاؤه فقط كـ seed reference)
+- `ProjectGrid` و `ProjectCard` يقرآن من Supabase مباشرة (موجود مسبقاً)
 
-```text
-/                  → الصفحة الرئيسية (Hero فضائي + شبكة المشاريع الـ 14)
-/projects          → استعراض كامل بفلترة حسب الفئة + بحث فوري
-/projects/$slug    → صفحة تفاصيل لكل مشروع (وصف + لقطات + زر "افتح المشروع")
-/dashboard         → لوحة تحكم موحدة (إحصائيات لكل مشروع، روابط سريعة)
-/services          → كل الخدمات المُجمَّعة من المشاريع في مكان واحد
-/about             → قصة المنصة والرؤية
-/contact           → تواصل + AI assistant مدمج
-```
+### 2. إنشاء الجداول الناقصة (Migration)
 
-## المكونات الرئيسية
+**جدول `user_roles`** (بديل آمن للبريد الثابت):
+- `app_role` enum: `admin`, `viewer`
+- جدول `user_roles (user_id, role)` + RLS
+- تحديث دالة `is_admin()` لتستخدم `has_role()` بدل مقارنة البريد
+- زرع المستخدم الحالي كـ admin
 
-1. **HeroNexus** — بطل الصفحة: عنوان عملاق "نكسس — كل مشاريعك في مكان واحد"، خلفية aurora متحركة، عداد حي للمشاريع
-2. **ProjectGrid** — شبكة بطاقات زجاجية للمشاريع الـ 14 مع أيقونة + وصف + شارة الفئة + زر فتح
-3. **ProjectCard** — بطاقة زجاجية بتأثير tilt 3D وتوهج نيون عند التحويم
-4. **CategoryFilter** — أزرار زجاجية للتصفية: AI، تجارة، خدمات، نقل، طباعة، عقارات
-5. **GlobalSearch** — شريط بحث (⌘K) للوصول السريع لأي مشروع
-6. **NavBar** — شريط علوي زجاجي عائم مع شعار + روابط + مبدّل لغة
-7. **AuroraBackground** — مكون خلفية متحركة (CSS pure، خفيف على الأداء)
-8. **StatsBar** — عدّادات حية: 14 مشروع، X خدمة، Y مستخدم
-9. **ServicesShowcase** — عرض موحد لكل الخدمات المستخرجة من المشاريع
-10. **Footer** — تذييل زجاجي بسيط
+**جدول `alerts`**:
+- `id, project_id, type (down/slow/ssl), severity, message, is_read, created_at`
+- RLS: admin فقط
+- Trigger: عند `is_up=false` في `project_checks` يُنشئ تنبيه تلقائياً
 
-## بيانات المشاريع
+**جدول `admin_settings`** (key-value):
+- `key, value (jsonb), updated_at`
+- مفاتيح أولية: `check_interval_minutes`, `alert_email`, `slow_threshold_ms`
 
-سأنشئ ملف `src/data/projects.ts` يحوي كائنًا لكل مشروع (id، slug، اسم عربي، وصف، فئة، رابط، أيقونة Lucide، لون توهج). كل البيانات ثابتة TypeScript — لا حاجة لقاعدة بيانات في هذه المرحلة.
+### 3. ربط صفحات Admin بالبيانات الحقيقية
+
+| الصفحة | المصدر الحقيقي |
+|--------|----------------|
+| `/admin` | `get_dashboard_stats()` RPC (موجودة) |
+| `/admin/projects` | `projects` table CRUD (موجود) |
+| `/admin/checks` | `project_checks` SELECT مع pagination |
+| `/admin/visits` | `project_visits` + chart زمني |
+| `/admin/alerts` | `alerts` table + mark as read |
+| `/admin/settings` | `admin_settings` upsert |
+
+### 4. تفعيل تسجيل الزيارات الحقيقي
+- في `ProjectCard` عند النقر: استدعاء RPC `log_project_visit(project_id)`
+- زيادة `visit_count` تلقائياً (الدالة موجودة)
+
+### 5. الفحص التلقائي الدوري
+- Server route عام: `/api/public/cron/check-projects`
+- Verification عبر `CRON_SECRET` header
+- إعداد pg_cron داخل Supabase لاستدعائه كل 15 دقيقة (حسب `admin_settings.check_interval_minutes`)
+
+### 6. توحيد المصادقة
+- إزالة الاعتماد على `ADMIN_EMAIL` الثابت في `src/lib/admin.ts`
+- استبداله بـ hook `useIsAdmin()` يستدعي RPC `is_admin()`
+- `AdminGuard` يستخدم الـ hook الجديد
+
+---
 
 ## التفاصيل التقنية
 
-- **Stack**: TanStack Start (موجود) + Tailwind v4 + shadcn/ui
-- **Routing**: ملفات منفصلة لكل صفحة في `src/routes/` (لـ SSR/SEO صحيح)
-- **RTL**: `dir="rtl"` على `<html>` في `__root.tsx` + خطوط عربية من Google Fonts
-- **الحركات**: Tailwind animations + CSS transforms (لا مكتبات ثقيلة)
-- **الأيقونات**: lucide-react (موجود)
-- **الأداء**: كل التأثيرات CSS-only، لا canvas/WebGL ثقيل
-- **SEO**: head() مخصص لكل route مع og:title/description بالعربية
-- **التوسعة**: لاحقًا يمكن إضافة Lovable Cloud + Auth لربط حقيقي بالمشاريع
+**Migrations مطلوبة:**
+```sql
+-- 1. user_roles + has_role
+CREATE TYPE app_role AS ENUM ('admin','viewer');
+CREATE TABLE user_roles (...);
+CREATE FUNCTION has_role(_uid uuid, _role app_role) ...
+-- إعادة تعريف is_admin() لاستخدام has_role
 
-## ملفات سيتم إنشاؤها
+-- 2. alerts + trigger
+CREATE TABLE alerts (...);
+CREATE FUNCTION create_alert_on_down() RETURNS trigger ...
+CREATE TRIGGER on_check_insert AFTER INSERT ON project_checks ...
 
-```text
-src/
-  routes/
-    __root.tsx           (تحديث: RTL + خطوط + AuroraBackground)
-    index.tsx            (استبدال placeholder بالصفحة الرئيسية)
-    projects.tsx         (جديد)
-    projects.$slug.tsx   (جديد)
-    dashboard.tsx        (جديد)
-    services.tsx         (جديد)
-    about.tsx            (جديد)
-    contact.tsx          (جديد)
-  components/
-    nexus/
-      NavBar.tsx
-      HeroNexus.tsx
-      ProjectGrid.tsx
-      ProjectCard.tsx
-      CategoryFilter.tsx
-      GlobalSearch.tsx
-      AuroraBackground.tsx
-      StatsBar.tsx
-      ServicesShowcase.tsx
-      Footer.tsx
-  data/
-    projects.ts          (بيانات الـ 14 مشروع)
-    services.ts          (الخدمات المُجمَّعة)
-  styles.css             (تحديث: ألوان نيون + glass tokens + RTL)
+-- 3. admin_settings
+CREATE TABLE admin_settings (key text PK, value jsonb, ...);
+INSERT defaults;
+
+-- 4. seed user_roles بالبريد الحالي كـ admin
+-- 5. seed projects بالـ14 مشروع
 ```
 
-## ما لن يُحذف
+**Secrets جديدة:** `CRON_SECRET` (للحماية endpoint الفحص الدوري)
 
-- كل مكونات shadcn/ui الموجودة تبقى كما هي
-- بنية TanStack Start الأساسية (router.tsx, __root.tsx shell) تبقى
-- فقط `src/routes/index.tsx` placeholder سيُستبدل
+**ملفات ستُعدَّل/تُنشأ:**
+- جديد: `src/hooks/use-is-admin.ts`, `src/hooks/use-alerts.ts`, `src/hooks/use-checks.ts`, `src/hooks/use-visits.ts`, `src/hooks/use-settings.ts`
+- جديد: `src/routes/api.public.cron.check-projects.ts`
+- تعديل: `src/components/nexus/AdminGuard.tsx`, `src/lib/admin.ts`, `src/components/nexus/ProjectCard.tsx`
+- تعديل: `src/routes/admin.checks.tsx`, `admin.visits.tsx`, `admin.alerts.tsx`, `admin.settings.tsx`
+- حذف: `src/data/projects.ts` (بعد الترحيل)
 
-## الخطوة التالية بعد الموافقة
+---
 
-أنفّذ كل شيء دفعة واحدة: تحديث styles.css بالنظام الزجاجي → إنشاء بيانات المشاريع → بناء كل المكونات → إنشاء كل الصفحات → تحديث __root.tsx مع RTL وخلفية Aurora.
+## النتيجة النهائية
 
+- ✅ مصادقة Google حقيقية (موجودة أصلاً) + نظام أدوار قابل للتوسع
+- ✅ 14 مشروع في قاعدة بيانات حقيقية + قابلة للإضافة من لوحة التحكم
+- ✅ فحص حالة المواقع تلقائي كل X دقيقة
+- ✅ تنبيهات تلقائية عند تعطل أي موقع
+- ✅ إحصائيات زيارات حقيقية
+- ✅ إعدادات قابلة للتعديل من الواجهة
+- ✅ كل صفحات `/admin` تعرض بيانات حية من Supabase
+
+هل أبدأ التنفيذ؟
