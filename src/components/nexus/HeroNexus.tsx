@@ -1,8 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { Sparkles, ArrowLeft, Layers } from "lucide-react";
-import { PROJECTS } from "@/data/projects";
+import { useProjects } from "@/hooks/use-projects";
 
 export function HeroNexus() {
+  const { projects } = useProjects();
+  const count = projects.length || 14;
   return (
     <section className="relative flex min-h-[92vh] items-center justify-center overflow-hidden px-6 pt-32">
       <div className="relative z-10 mx-auto max-w-5xl text-center">
@@ -11,7 +13,7 @@ export function HeroNexus() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[oklch(0.85_0.18_200)] opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-[oklch(0.85_0.18_200)]" />
           </span>
-          <span className="text-muted-foreground">{PROJECTS.length} مشروع نشط الآن</span>
+          <span className="text-muted-foreground">{count} مشروع نشط الآن</span>
         </div>
 
         <h1 className="font-display text-5xl font-bold leading-tight tracking-tight sm:text-7xl md:text-8xl">
@@ -45,7 +47,7 @@ export function HeroNexus() {
         {/* Stats */}
         <div className="mx-auto mt-16 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
           {[
-            { v: PROJECTS.length, l: "مشروع" },
+            { v: count, l: "مشروع" },
             { v: "9", l: "فئة" },
             { v: "50+", l: "خدمة" },
             { v: "∞", l: "إمكانية" },

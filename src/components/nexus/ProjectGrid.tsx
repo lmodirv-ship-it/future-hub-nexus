@@ -1,22 +1,31 @@
 import { useMemo, useState } from "react";
-import { PROJECTS, CATEGORIES, type ProjectCategory } from "@/data/projects";
+import { useProjects } from "@/hooks/use-projects";
 import { ProjectCard } from "./ProjectCard";
 import { Search } from "lucide-react";
 
-export function ProjectGrid({ showFilters = true }: { showFilters?: boolean }) {
-  const [cat, setCat] = useState<ProjectCategory | "all">("all");
+export function ProjectGrid({ showFilters = true, limit }: { showFilters?: boolean; limit?: number }) {
+  const { projects, loading } = useProjects();
+  const [cat, setCat] = useState<string>("all");
   const [q, setQ] = useState("");
 
+  const categories = useMemo(() => {
+    const map = new Map<string, string>();
+    map.set("all", "كل المشاريع");
+    projects.forEach((p) => map.set(p.category, p.category_label));
+    return Array.from(map, ([value, label]) => ({ value, label }));
+  }, [projects]);
+
   const filtered = useMemo(() => {
-    return PROJECTS.filter((p) => {
+    const list = projects.filter((p) => {
       const inCat = cat === "all" || p.category === cat;
       const inQ = !q ||
-        p.nameAr.includes(q) ||
+        p.name_ar.includes(q) ||
         p.name.toLowerCase().includes(q.toLowerCase()) ||
-        p.tagline.includes(q);
+        (p.description_ar ?? "").includes(q);
       return inCat && inQ;
     });
-  }, [cat, q]);
+    return limit ? list.slice(0, limit) : list;
+  }, [projects, cat, q, limit]);
 
   return (
     <section className="relative">
@@ -32,7 +41,7 @@ export function ProjectGrid({ showFilters = true }: { showFilters?: boolean }) {
             />
           </div>
           <div className="flex flex-wrap justify-center gap-2">
-            {CATEGORIES.map((c) => (
+            {categories.map((c) => (
               <button
                 key={c.value}
                 onClick={() => setCat(c.value)}
@@ -55,7 +64,7 @@ export function ProjectGrid({ showFilters = true }: { showFilters?: boolean }) {
         ))}
       </div>
 
-      {filtered.length === 0 && (
+      {filtered.length === 0 && !loading && (
         <div className="glass mx-auto mt-10 max-w-md rounded-2xl p-10 text-center">
           <p className="text-muted-foreground">لا توجد مشاريع مطابقة.</p>
         </div>
