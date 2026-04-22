@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Link, useLocation } from "@tanstack/react-router";
+import { useLocation } from "@tanstack/react-router";
 import {
   LayoutDashboard, FolderKanban, Activity, Eye, Bell, Settings,
   Menu, X, ExternalLink, LogOut, Home,
@@ -8,14 +8,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProjects } from "@/hooks/use-projects";
 
-const NAV = [
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+const NAV: NavItem[] = [
   { to: "/admin", label: "نظرة عامة", icon: LayoutDashboard, exact: true },
   { to: "/admin/projects", label: "المشاريع", icon: FolderKanban },
   { to: "/admin/checks", label: "الفحوصات", icon: Activity },
   { to: "/admin/visits", label: "الزيارات", icon: Eye },
   { to: "/admin/alerts", label: "التنبيهات", icon: Bell },
   { to: "/admin/settings", label: "الإعدادات", icon: Settings },
-] as const;
+];
 
 export function AdminLayout({ children, title, subtitle, actions }: { children: ReactNode; title: string; subtitle?: string; actions?: ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -68,9 +69,9 @@ export function AdminLayout({ children, title, subtitle, actions }: { children: 
               {NAV.map((item) => {
                 const active = isActive(item.to, item.exact);
                 return (
-                  <Link
+                  <a
                     key={item.to}
-                    to={item.to}
+                    href={item.to}
                     onClick={() => setOpen(false)}
                     className={`flex items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors ${
                       active
@@ -87,15 +88,15 @@ export function AdminLayout({ children, title, subtitle, actions }: { children: 
                         {downCount}
                       </span>
                     )}
-                  </Link>
+                  </a>
                 );
               })}
             </nav>
 
             <div className="mt-6 space-y-1 border-t border-white/5 pt-4">
-              <Link to="/" className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground">
+              <a href="/" className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground">
                 <Home className="h-4 w-4" /> الموقع
-              </Link>
+              </a>
               <a href="https://lovable.dev" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground">
                 <ExternalLink className="h-4 w-4" /> Lovable
               </a>
