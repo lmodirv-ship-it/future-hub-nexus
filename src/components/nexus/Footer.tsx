@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 export function Footer() {
+  const { t } = useI18n();
   return (
     <footer className="relative mt-32 border-t border-white/10 pb-8 pt-16">
       <div className="mx-auto max-w-6xl px-6">
@@ -14,34 +16,34 @@ export function Footer() {
               <span className="font-display text-lg font-bold neon-text">نكسس</span>
             </Link>
             <p className="mt-3 text-sm text-muted-foreground">
-              مركز تحكم موحد لكل مشاريعك الرقمية في فضاء واحد من المستقبل.
+              {t("footer.tagline")}
             </p>
           </div>
           <div>
-            <h4 className="mb-3 font-display font-semibold">المنصة</h4>
+            <h4 className="mb-3 font-display font-semibold">{t("footer.platform")}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/projects" className="hover:text-foreground">المشاريع</Link></li>
-              <li><Link to="/services" className="hover:text-foreground">الخدمات</Link></li>
-              <li><Link to="/admin" className="hover:text-foreground">لوحة التحكم</Link></li>
+              <li><Link to="/projects" className="hover:text-foreground">{t("nav.projects")}</Link></li>
+              <li><Link to="/services" className="hover:text-foreground">{t("nav.services")}</Link></li>
+              <li><Link to="/admin" className="hover:text-foreground">{t("nav.admin")}</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="mb-3 font-display font-semibold">المنظومة</h4>
+            <h4 className="mb-3 font-display font-semibold">{t("footer.ecosystem")}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/about" className="hover:text-foreground">عن المنصة</Link></li>
-              <li><Link to="/contact" className="hover:text-foreground">تواصل</Link></li>
+              <li><Link to="/about" className="hover:text-foreground">{t("nav.about")}</Link></li>
+              <li><Link to="/contact" className="hover:text-foreground">{t("nav.contact")}</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="mb-3 font-display font-semibold">تابعنا</h4>
+            <h4 className="mb-3 font-display font-semibold">{t("footer.follow")}</h4>
             <p className="text-sm text-muted-foreground">
-              صُمم بإتقان على Lovable — كل المشاريع في مكان واحد.
+              {t("footer.followText")}
             </p>
           </div>
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/5 pt-6 text-xs text-muted-foreground md:flex-row">
-          <span>© {new Date().getFullYear()} نكسس. جميع الحقوق محفوظة.</span>
-          <span>صُنع بـ ✦ في عالم رقمي بلا حدود</span>
+          <span>© {new Date().getFullYear()} {t("footer.rights")}</span>
+          <span>{t("footer.made")}</span>
         </div>
       </div>
     </footer>

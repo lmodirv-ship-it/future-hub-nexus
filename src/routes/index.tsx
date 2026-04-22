@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeroNexus } from "@/components/nexus/HeroNexus";
 import { ProjectGrid } from "@/components/nexus/ProjectGrid";
 import { ArrowLeft } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const { t } = useI18n();
   return (
     <>
       <HeroNexus />
@@ -23,15 +25,15 @@ function Index() {
         <div className="mb-10 flex items-end justify-between">
           <div>
             <h2 className="font-display text-3xl font-bold sm:text-4xl">
-              <span className="neon-text">المشاريع</span> النشطة
+              <span className="neon-text">{t("home.activeTitle")}</span> {t("home.activePrefix")}
             </h2>
-            <p className="mt-2 text-muted-foreground">كل أعمالك في مكان واحد، بشكل زجاجي مستقبلي.</p>
+            <p className="mt-2 text-muted-foreground">{t("home.activeDesc")}</p>
           </div>
           <Link
             to="/projects"
             className="hidden items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground sm:flex"
           >
-            عرض الكل
+            {t("home.viewAll")}
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </div>
