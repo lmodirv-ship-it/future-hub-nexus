@@ -25,6 +25,7 @@ import { Route as MarketplaceSlugRouteImport } from './routes/marketplace.$slug'
 import { Route as AdminVisitsRouteImport } from './routes/admin.visits'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminProjectsRouteImport } from './routes/admin.projects'
+import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as AdminChecksRouteImport } from './routes/admin.checks'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as ApiPublicCronCheckProjectsRouteImport } from './routes/api.public.cron.check-projects'
@@ -109,6 +110,11 @@ const AdminProjectsRoute = AdminProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLeadsRoute = AdminLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminChecksRoute = AdminChecksRouteImport.update({
   id: '/checks',
   path: '/checks',
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/services': typeof ServicesRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
+  '/admin/leads': typeof AdminLeadsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
@@ -161,6 +168,7 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
+  '/admin/leads': typeof AdminLeadsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
@@ -183,6 +191,7 @@ export interface FileRoutesById {
   '/services': typeof ServicesRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
+  '/admin/leads': typeof AdminLeadsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
@@ -206,6 +215,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/admin/alerts'
     | '/admin/checks'
+    | '/admin/leads'
     | '/admin/projects'
     | '/admin/settings'
     | '/admin/visits'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/admin/alerts'
     | '/admin/checks'
+    | '/admin/leads'
     | '/admin/projects'
     | '/admin/settings'
     | '/admin/visits'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/admin/alerts'
     | '/admin/checks'
+    | '/admin/leads'
     | '/admin/projects'
     | '/admin/settings'
     | '/admin/visits'
@@ -385,6 +397,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProjectsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/leads': {
+      id: '/admin/leads'
+      path: '/leads'
+      fullPath: '/admin/leads'
+      preLoaderRoute: typeof AdminLeadsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/checks': {
       id: '/admin/checks'
       path: '/checks'
@@ -412,6 +431,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAlertsRoute: typeof AdminAlertsRoute
   AdminChecksRoute: typeof AdminChecksRoute
+  AdminLeadsRoute: typeof AdminLeadsRoute
   AdminProjectsRoute: typeof AdminProjectsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminVisitsRoute: typeof AdminVisitsRoute
@@ -420,6 +440,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAlertsRoute: AdminAlertsRoute,
   AdminChecksRoute: AdminChecksRoute,
+  AdminLeadsRoute: AdminLeadsRoute,
   AdminProjectsRoute: AdminProjectsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminVisitsRoute: AdminVisitsRoute,
