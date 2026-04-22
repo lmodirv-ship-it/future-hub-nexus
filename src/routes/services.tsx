@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PROJECTS } from "@/data/projects";
 import { Check } from "lucide-react";
 import { AdminGuard } from "@/components/nexus/AdminGuard";
+import { useProjects } from "@/hooks/use-projects";
+import { getIcon, GLOW_MAP, type GlowKey } from "@/lib/icon-map";
 
 export const Route = createFileRoute("/services")({
   head: () => ({
@@ -15,13 +16,6 @@ export const Route = createFileRoute("/services")({
   component: ServicesPage,
 });
 
-const glowMap = {
-  violet: "from-[oklch(0.65_0.25_290)] to-[oklch(0.7_0.28_330)]",
-  cyan: "from-[oklch(0.85_0.18_200)] to-[oklch(0.65_0.25_290)]",
-  magenta: "from-[oklch(0.7_0.28_330)] to-[oklch(0.78_0.22_350)]",
-  pink: "from-[oklch(0.78_0.22_350)] to-[oklch(0.65_0.25_290)]",
-} as const;
-
 function ServicesPage() {
   return (
     <AdminGuard>
@@ -31,6 +25,7 @@ function ServicesPage() {
 }
 
 function ServicesInner() {
+  const { projects } = useProjects();
   return (
     <section className="relative mx-auto max-w-7xl px-6 pb-20 pt-32">
       <div className="mb-12 text-center">
@@ -38,32 +33,31 @@ function ServicesInner() {
           كل <span className="neon-text">الخدمات</span> في مكان واحد
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-          أكثر من 50 خدمة مُجمَّعة من 14 مشروعاً — جاهزة للاستخدام الفوري.
+          نظرة شاملة على كل {projects.length} مشروعاً — جاهزة للاستخدام الفوري.
         </p>
       </div>
 
       <div className="space-y-6">
-        {PROJECTS.map((p) => {
-          const Icon = p.icon;
+        {projects.map((p) => {
+          const Icon = getIcon(p.icon);
+          const glow: GlowKey = (p.glow as GlowKey) in GLOW_MAP ? (p.glow as GlowKey) : "violet";
           return (
             <div key={p.id} className="glass rounded-2xl p-6">
               <div className="mb-4 flex items-center gap-3">
-                <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${glowMap[p.glow]}`}>
+                <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${GLOW_MAP[glow]}`}>
                   <Icon className="h-5 w-5 text-background" />
                 </div>
                 <div>
-                  <h3 className="font-display text-lg font-bold">{p.nameAr}</h3>
-                  <p className="text-xs text-muted-foreground">{p.categoryLabel}</p>
+                  <h3 className="font-display text-lg font-bold">{p.name_ar}</h3>
+                  <p className="text-xs text-muted-foreground">{p.category_label}</p>
                 </div>
               </div>
-              <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                {p.features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 rounded-lg bg-white/[0.03] px-3 py-2 text-sm">
-                    <Check className="h-4 w-4 shrink-0 text-[oklch(0.85_0.18_200)]" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
+              {p.description_ar && (
+                <p className="flex items-start gap-2 rounded-lg bg-white/[0.03] px-3 py-2 text-sm text-muted-foreground">
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-[oklch(0.85_0.18_200)]" />
+                  <span>{p.description_ar}</span>
+                </p>
+              )}
             </div>
           );
         })}
