@@ -22,7 +22,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link to="/projects" className="hover:text-foreground">المشاريع</Link></li>
               <li><Link to="/services" className="hover:text-foreground">الخدمات</Link></li>
-              <li><Link to="/dashboard" className="hover:text-foreground">لوحة التحكم</Link></li>
+              <li><Link to="/admin" className="hover:text-foreground">لوحة التحكم</Link></li>
             </ul>
           </div>
           <div>
