@@ -11,6 +11,16 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    environment:
+      # Wrangler reads vars from process env at runtime and forwards
+      # them as bindings (env.X) to the worker, exactly like Cloudflare.
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      LOVABLE_API_KEY: ${LOVABLE_API_KEY}
+      VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY}
+      VITE_SUPABASE_PROJECT_ID: ${VITE_SUPABASE_PROJECT_ID}
     expose:
       - "3000"
     networks:
