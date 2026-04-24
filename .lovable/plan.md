@@ -1,145 +1,66 @@
+# خطة النشر الذاتي (Self-Hosting) عبر Docker + GitHub Actions
 
-# خطة تحويل الموقع إلى مشروع ناجح يدرّ مداخيل (متوافق مع المغرب 🇲🇦)
+## الإعدادات المعتمدة
+- **الدومين**: IP فقط مؤقتاً (HTTP بدون SSL)
+- **منفذ التطبيق الداخلي**: `3000`
+- **SSL**: لا (يمكن إضافته لاحقاً)
+- **قاعدة البيانات**: تبقى على Lovable Cloud
 
-## ملاحظة مهمة عن المدفوعات في المغرب
+## الملفات التي ستُنشأ (6 ملفات جديدة فقط — لا تعديل على الكود الحالي)
 
-Stripe **غير مدعوم رسمياً للبائعين في المغرب** (لا يمكن فتح حساب Stripe بـ ID مغربي). لكن **Paddle مدعوم بالكامل في المغرب** لأنه يعمل كـ **Merchant of Record** — أنت تبيع لـ Paddle، و Paddle يبيع للعميل النهائي ويحوّل لك الأرباح بالـ USD/EUR إلى:
-- حساب بنكي مغربي (تحويل دولي SWIFT)
-- أو **Payoneer** / **Wise** (الأسهل والأسرع للمغاربة)
+### 1. `Dockerfile`
+- مرحلة `builder`: `oven/bun:1` — `bun install` + `bun run build` مع تمرير `VITE_SUPABASE_*` كـ build args
+- مرحلة `runner`: `node:20-alpine` خفيفة — تشغّل المخرجات على المنفذ 3000
+- `EXPOSE 3000` و `CMD ["node", ".output/server/index.mjs"]`
 
-**القرار**: نستخدم **Paddle** كبوابة دفع رئيسية. بديل مغربي محلي: **CMI** (للعملاء المغاربة بالدرهم) — يمكن إضافته لاحقاً كقناة ثانية.
+### 2. `docker-compose.yml`
+- خدمة `app`: تبني من `Dockerfile`، تقرأ `.env`، منفذ داخلي 3000
+- خدمة `nginx`: `nginx:alpine`، تربط المنفذ 80 الخارجي، تعتمد على `app`
+- شبكة `appnet` داخلية
+- `restart: unless-stopped` للخدمتين
 
----
+### 3. `nginx/nginx.conf`
+- `upstream app { server app:3000; }`
+- `server { listen 80; ... }` يوجّه كل شيء إلى `app`
+- رؤوس Proxy + دعم WebSocket/SSE (`Upgrade`, `Connection`)
+- `gzip on` للأصول النصية
+- رؤوس أمان (X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
 
-## الفكرة الإستراتيجية
+### 4. `.github/workflows/deploy.yml`
+- Trigger: `push` على فرع `main`
+- خطوات:
+  1. `appleboy/ssh-action@v1` يتصل عبر `SERVER_HOST` + `SERVER_USER` + `SERVER_PORT` + `SERVER_SSH_KEY`
+  2. على السيرفر: `cd ~/app && git pull origin main`
+  3. `docker compose up -d --build`
+  4. `docker image prune -f`
 
-تحويل **Future Hub Nexus** من كتالوج إلى **منصة SaaS عربية** بأربع قنوات دخل، كلها تعمل عبر Paddle.
-
----
-
-## مصادر الدخل (4 قنوات)
-
-### 1) خدمة "مراقبة المواقع" (الأهم — دخل متكرر MRR)
-نملك البنية أصلاً (`project_checks` + `alerts` + cron). نحوّلها لـ SaaS:
-- **Free**: موقع واحد، فحص كل ساعة
-- **Pro — 9$/شهر**: 10 مواقع، فحص كل 5 دقائق، تنبيهات Email
-- **Business — 29$/شهر**: 50 موقع، فحص كل دقيقة، تقارير، API، تنبيهات WhatsApp
-
-### 2) سوق القوالب (Marketplace) — دخل One-time
-بيع نسخ من مشاريعك الـ14 كقوالب جاهزة:
-- 19$ – 99$ لكل قالب
-- تسليم فوري عبر رابط download token موقّت
-
-### 3) خدمات احترافية (Done-For-You) — Leads عالية القيمة
-- "أنشئ لي موقعاً" — 199$ – 999$
-- استشارة ساعة — 49$
-- نموذج طلب → جدول `service_requests` → لوحة `/admin/leads`
-
-### 4) رعاية / إعلانات (Sponsored Slots)
-- بطاقة مميزة في الصفحة الرئيسية — 49$/شهر
-- إدارة من `/admin/sponsorships`
-
----
-
-## البنية التقنية
-
-### قاعدة البيانات (جداول جديدة + RLS)
-```text
-plans              (id, name, price_cents, currency, max_sites, check_interval_min, features jsonb)
-subscriptions      (id, user_id, plan_id, status, paddle_sub_id, current_period_end)
-monitored_sites    (id, user_id, url, name, is_up, last_checked_at)
-templates          (id, slug, title, description, price_cents, demo_url, source_url)
-template_purchases (id, user_id, template_id, paddle_txn_id, download_token, expires_at)
-service_requests   (id, name, email, service_type, budget, message, status)
-sponsorships       (id, project_id, starts_at, ends_at, amount_cents, sponsor_name)
+### 5. `.env.example`
+```
+VITE_SUPABASE_URL=https://vuecrydmovopxobamyoz.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1ZWNyeWRtb3ZvcHhvYmFteW96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2ODU5OTQsImV4cCI6MjA5MjI2MTk5NH0.o5ESzCORyZlROcPDMKHqa9j73p6Ul9hGI98HgyzyPxU
+VITE_SUPABASE_PROJECT_ID=vuecrydmovopxobamyoz
 ```
 
-### تكامل المدفوعات
-- استخدام أداة Lovable المدمجة `enable_paddle_payments` (لا تحتاج حساب Paddle شخصي للبدء — Lovable يدير الـ sandbox)
-- Edge Functions تلقائية: checkout, subscription, webhook
-- Webhook signature verification إجباري
-- عند الانتقال للـ live: تتطلب verification من Paddle (مدة 1-3 أيام)
+### 6. `DEPLOY.md` (دليل عربي)
+- متطلبات السيرفر: Docker + Docker Compose + Git
+- خطوات التشغيل الأول (clone, .env, up)
+- مراقبة السجلات
+- إضافة دومين + Let's Encrypt لاحقاً
+- استكشاف الأخطاء الشائعة
 
-### المسارات الجديدة
+## ⚠️ ملاحظة حول SSR على Worker vs Node
+المشروع الحالي مُعدّ لـ Cloudflare Workers (`wrangler.jsonc`). عند البناء بـ Docker سنستخدم مخرجات Node العادية. إذا فشل البناء بسبب `target: "cloudflare-module"` في `vite.config.ts`، سأضيف خطوة في الـ Dockerfile لاستخدام preset Node أو سأطلب موافقتك لتعديل بسيط في `vite.config.ts` لدعم البيئتين.
 
-**عامة (تدر دخل):**
-- `/pricing` — الخطط الثلاثية
-- `/marketplace` + `/marketplace/$slug` — القوالب
-- `/monitor` — Landing لخدمة المراقبة
-- `/services` (تحديث) — نموذج طلب احترافي
-
-**لوحة المشترك `_authenticated`:**
-- `/app/sites` — إدارة المواقع المراقَبة
-- `/app/billing` — Customer Portal
-- `/app/downloads` — القوالب المُشتراة
-
-**إضافات Admin:**
-- `/admin/revenue` — MRR + إيرادات + funnel
-- `/admin/leads` — طلبات الخدمات
-- `/admin/templates` — إدارة القوالب
-- `/admin/sponsorships` — إدارة الرعاية
-
-### نظام المراقبة
-- cron الحالي يفحص `projects` (للعرض) — يبقى
-- cron جديد يفحص `monitored_sites` بحسب `plan.check_interval_min`
-- تنبيهات Email عبر **Resend** (متاح كـ connector)
-
-### SEO وجلب الزوار (مجاناً)
-- `/sitemap.xml` ديناميكي
-- JSON-LD Schema.org لكل قالب/مشروع
-- Open Graph + Twitter Card لكل route
-- صفحة `/blog` + `/blog/$slug` (مقالات في DB)
-- robots.txt
-
-### تحليلات
-- جدول `events` (page_view, pricing_view, checkout_start, purchase)
-- لوحة `/admin/revenue`: Visitors → Trial → Paid
+## الخطوات بعد إنشاء الملفات
+سأعطيك سلسلة أوامر مرتبة لتنفيذها على السيرفر **مرة واحدة**:
+```bash
+rm -f ~/.env
+mkdir -p ~/app && cd ~/app
+git clone https://github.com/lmodirv-ship-it/future-hub-nexus.git .
+cp .env.example .env
+docker compose up -d --build
+```
+بعدها كل `git push` = نشر تلقائي.
 
 ---
-
-## مراحل التنفيذ
-
-**المرحلة 1 — الدفع + Pricing (الأهم):**
-- تشغيل `recommend_payment_provider` ثم `enable_paddle_payments`
-- إنشاء `plans` + `subscriptions` + webhook handler
-- صفحة `/pricing` تعمل end-to-end (sandbox)
-
-**المرحلة 2 — Marketplace:**
-- جداول `templates` + `template_purchases`
-- صفحات `/marketplace` + تفاصيل القالب + شراء + تسليم آمن
-- زرع 14 مشروع كقوالب أولية
-
-**المرحلة 3 — خدمة المراقبة:**
-- `monitored_sites` + cron منفصل + ربط حدود الخطة
-- صفحات `/monitor` + `/app/sites`
-
-**المرحلة 4 — الخدمات والـ Leads:**
-- `/services` form + `service_requests`
-- `/admin/leads`
-- إيميل تنبيه للأدمن (Resend)
-
-**المرحلة 5 — SEO + التحليلات + Blog:**
-- sitemap + JSON-LD + meta
-- `/admin/revenue` dashboard
-- `/blog` أساسي
-
----
-
-## ما سأطلبه أثناء التنفيذ
-1. **تفعيل Paddle** (يتطلب **خطة Pro** على Lovable)
-2. **Resend connector** للإيميلات
-3. (اختياري) **Twilio** لتنبيهات WhatsApp في خطة Business
-4. أسعار الخطط النهائية (المقترح أعلاه قابل للتعديل)
-5. هل تريد أيضاً قناة دفع مغربية محلية (**CMI**) للعملاء المغاربة بالدرهم؟ يمكن إضافتها كمرحلة 6.
-
----
-
-## النتيجة المتوقعة
-- 💰 دخل متكرر شهرياً (MRR) من اشتراكات المراقبة
-- 💵 دخل One-time من بيع القوالب
-- 📞 Pipeline من Leads عالية القيمة للخدمات
-- 🇲🇦 يعمل من المغرب بدون مشاكل (Paddle MoR)
-- 📈 SEO قوي يجلب trafic عضوي مجاني
-- 📊 لوحة تحكم تُظهر إيرادات حقيقية
-
-هل أبدأ بالمرحلة 1 (Paddle + Pricing)؟
+**اضغط Approve لبدء إنشاء الملفات.**
