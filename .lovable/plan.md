@@ -1,66 +1,49 @@
-# خطة النشر الذاتي (Self-Hosting) عبر Docker + GitHub Actions
+## خطة إصلاح خطأ Docker الحالي
 
-## الإعدادات المعتمدة
-- **الدومين**: IP فقط مؤقتاً (HTTP بدون SSL)
-- **منفذ التطبيق الداخلي**: `3000`
-- **SSL**: لا (يمكن إضافته لاحقاً)
-- **قاعدة البيانات**: تبقى على Lovable Cloud
+سأحوّل إعداد النشر الذاتي ليبني ويشغّل التطبيق بالطريقة الصحيحة لهذا المشروع، لأن `Dockerfile` الحالي يفترض وجود مجلد `.output` بينما المشروع مضبوط حالياً على مخرجات استضافة مختلفة.
 
-## الملفات التي ستُنشأ (6 ملفات جديدة فقط — لا تعديل على الكود الحالي)
+### ما الذي سأعدّله
+1. **تصحيح إعداد البناء في `vite.config.ts`**
+   - إضافة إعداد واضح يسمح ببناء نسخة مخصّصة لـ Node عند التشغيل داخل Docker.
+   - إبقاء الإعداد الحالي مناسباً للمعاينة/النشر الحالي حتى لا ينكسر المشروع خارج Docker.
 
-### 1. `Dockerfile`
-- مرحلة `builder`: `oven/bun:1` — `bun install` + `bun run build` مع تمرير `VITE_SUPABASE_*` كـ build args
-- مرحلة `runner`: `node:20-alpine` خفيفة — تشغّل المخرجات على المنفذ 3000
-- `EXPOSE 3000` و `CMD ["node", ".output/server/index.mjs"]`
+2. **تصحيح `Dockerfile`**
+   - إزالة الافتراض الخاطئ بأن المخرجات ستكون داخل `/app/.output`.
+   - تحديث أوامر `COPY` و `CMD` لتطابق المخرج الحقيقي بعد ضبط البناء.
+   - الإبقاء على تمرير متغيرات `VITE_*` اللازمة للبناء.
 
-### 2. `docker-compose.yml`
-- خدمة `app`: تبني من `Dockerfile`، تقرأ `.env`، منفذ داخلي 3000
-- خدمة `nginx`: `nginx:alpine`، تربط المنفذ 80 الخارجي، تعتمد على `app`
-- شبكة `appnet` داخلية
-- `restart: unless-stopped` للخدمتين
+3. **مراجعة `docker-compose.yml` و `nginx/nginx.conf`**
+   - التأكد أن المنفذ الداخلي والتوجيه عبر Nginx يظلان صحيحين بعد تصحيح طريقة التشغيل.
+   - عدم تغيير شيء غير ضروري إذا كانت هذه الملفات سليمة.
 
-### 3. `nginx/nginx.conf`
-- `upstream app { server app:3000; }`
-- `server { listen 80; ... }` يوجّه كل شيء إلى `app`
-- رؤوس Proxy + دعم WebSocket/SSE (`Upgrade`, `Connection`)
-- `gzip on` للأصول النصية
-- رؤوس أمان (X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
+4. **تحديث دليل النشر `DEPLOY.md`**
+   - إزالة التعليمات التي توحي بأن `.output` مضمون دائماً.
+   - إضافة خطوات تحقق مختصرة بعد البناء حتى تعرف بسرعة إن كان التشغيل نجح.
 
-### 4. `.github/workflows/deploy.yml`
-- Trigger: `push` على فرع `main`
-- خطوات:
-  1. `appleboy/ssh-action@v1` يتصل عبر `SERVER_HOST` + `SERVER_USER` + `SERVER_PORT` + `SERVER_SSH_KEY`
-  2. على السيرفر: `cd ~/app && git pull origin main`
-  3. `docker compose up -d --build`
-  4. `docker image prune -f`
-
-### 5. `.env.example`
+5. **التحقق النهائي**
+   - التأكد أن المسار المتوقع يصبح:
+```text
+GitHub -> Docker build -> Node runtime داخل الحاوية -> Nginx :80
 ```
-VITE_SUPABASE_URL=https://vuecrydmovopxobamyoz.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1ZWNyeWRtb3ZvcHhvYmFteW96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2ODU5OTQsImV4cCI6MjA5MjI2MTk5NH0.o5ESzCORyZlROcPDMKHqa9j73p6Ul9hGI98HgyzyPxU
-VITE_SUPABASE_PROJECT_ID=vuecrydmovopxobamyoz
-```
+   - وبعدها أعطيك أوامر التنفيذ النهائية على السيرفر خطوة بخطوة.
 
-### 6. `DEPLOY.md` (دليل عربي)
-- متطلبات السيرفر: Docker + Docker Compose + Git
-- خطوات التشغيل الأول (clone, .env, up)
-- مراقبة السجلات
-- إضافة دومين + Let's Encrypt لاحقاً
-- استكشاف الأخطاء الشائعة
+## سبب الخطأ الحالي
+- `Dockerfile` الحالي يعتمد على:
+  - `COPY --from=builder /app/.output ./.output`
+  - `CMD ["node", ".output/server/index.mjs"]`
+- لكن هذا المشروع يستخدم إعداد TanStack Start مهيأ افتراضياً للاستضافة الحالية، وليس هناك ما يضمن إنشاء `.output` بهذا الشكل.
+- لذلك مرحلة `runner` تفشل لأن الملف/المجلد المطلوب غير موجود أصلاً.
 
-## ⚠️ ملاحظة حول SSR على Worker vs Node
-المشروع الحالي مُعدّ لـ Cloudflare Workers (`wrangler.jsonc`). عند البناء بـ Docker سنستخدم مخرجات Node العادية. إذا فشل البناء بسبب `target: "cloudflare-module"` في `vite.config.ts`، سأضيف خطوة في الـ Dockerfile لاستخدام preset Node أو سأطلب موافقتك لتعديل بسيط في `vite.config.ts` لدعم البيئتين.
+## التفاصيل التقنية
+- الملف `vite.config.ts` حالياً يستخدم `defineConfig()` بدون تخصيص.
+- `package.json` يبني عبر `vite build` فقط.
+- `wrangler.jsonc` يوضح أن المشروع مهيأ أيضاً لبيئة Worker.
+- لذلك سأضيف **تمييزاً بين build Docker وbuild البيئة الحالية** بدلاً من الاعتماد على `NITRO_PRESET=node-server` وحده.
 
-## الخطوات بعد إنشاء الملفات
-سأعطيك سلسلة أوامر مرتبة لتنفيذها على السيرفر **مرة واحدة**:
-```bash
-rm -f ~/.env
-mkdir -p ~/app && cd ~/app
-git clone https://github.com/lmodirv-ship-it/future-hub-nexus.git .
-cp .env.example .env
-docker compose up -d --build
-```
-بعدها كل `git push` = نشر تلقائي.
+## النتيجة المتوقعة بعد التنفيذ
+- `docker compose up -d --build` ينجح.
+- تختفي رسالة الخطأ الخاصة بـ `/app/.output: not found`.
+- الحاوية `app` تعمل فعلياً ويمكن لـ Nginx تمرير الطلبات إليها.
+- أزوّدك بعدها بأوامر قصيرة فقط لإعادة البناء والتأكد من التشغيل.
 
----
-**اضغط Approve لبدء إنشاء الملفات.**
+إذا وافقت، سأبدأ بتطبيق هذا الإصلاح مباشرة.
