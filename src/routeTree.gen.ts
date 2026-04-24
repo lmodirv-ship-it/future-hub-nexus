@@ -31,6 +31,7 @@ import { Route as AdminVisitsRouteImport } from './routes/admin.visits'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminProjectsRouteImport } from './routes/admin.projects'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
+import { Route as AdminControlCenterRouteImport } from './routes/admin.control-center'
 import { Route as AdminChecksRouteImport } from './routes/admin.checks'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as ApiPublicCronCheckProjectsRouteImport } from './routes/api.public.cron.check-projects'
@@ -145,6 +146,11 @@ const AdminLeadsRoute = AdminLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminControlCenterRoute = AdminControlCenterRouteImport.update({
+  id: '/control-center',
+  path: '/control-center',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminChecksRoute = AdminChecksRouteImport.update({
   id: '/checks',
   path: '/checks',
@@ -181,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
+  '/admin/control-center': typeof AdminControlCenterRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
+  '/admin/control-center': typeof AdminControlCenterRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
+  '/admin/control-center': typeof AdminControlCenterRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -265,6 +274,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/alerts'
     | '/admin/checks'
+    | '/admin/control-center'
     | '/admin/leads'
     | '/admin/projects'
     | '/admin/settings'
@@ -292,6 +302,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/alerts'
     | '/admin/checks'
+    | '/admin/control-center'
     | '/admin/leads'
     | '/admin/projects'
     | '/admin/settings'
@@ -319,6 +330,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/alerts'
     | '/admin/checks'
+    | '/admin/control-center'
     | '/admin/leads'
     | '/admin/projects'
     | '/admin/settings'
@@ -504,6 +516,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLeadsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/control-center': {
+      id: '/admin/control-center'
+      path: '/control-center'
+      fullPath: '/admin/control-center'
+      preLoaderRoute: typeof AdminControlCenterRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/checks': {
       id: '/admin/checks'
       path: '/checks'
@@ -531,6 +550,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAlertsRoute: typeof AdminAlertsRoute
   AdminChecksRoute: typeof AdminChecksRoute
+  AdminControlCenterRoute: typeof AdminControlCenterRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminProjectsRoute: typeof AdminProjectsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -540,6 +560,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAlertsRoute: AdminAlertsRoute,
   AdminChecksRoute: AdminChecksRoute,
+  AdminControlCenterRoute: AdminControlCenterRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminProjectsRoute: AdminProjectsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
