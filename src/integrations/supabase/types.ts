@@ -77,6 +77,72 @@ export type Database = {
           },
         ]
       }
+      managed_sites: {
+        Row: {
+          created_at: string
+          domain: string
+          enabled: boolean
+          github_branch: string
+          github_repo: string | null
+          id: string
+          last_checked_at: string | null
+          last_commit_sha: string | null
+          last_health_status: string | null
+          last_response_time_ms: number | null
+          last_status_code: number | null
+          last_sync_at: string | null
+          last_sync_status: string | null
+          mirror_path: string | null
+          name: string
+          notes: string | null
+          origin_server: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          domain: string
+          enabled?: boolean
+          github_branch?: string
+          github_repo?: string | null
+          id?: string
+          last_checked_at?: string | null
+          last_commit_sha?: string | null
+          last_health_status?: string | null
+          last_response_time_ms?: number | null
+          last_status_code?: number | null
+          last_sync_at?: string | null
+          last_sync_status?: string | null
+          mirror_path?: string | null
+          name: string
+          notes?: string | null
+          origin_server?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          domain?: string
+          enabled?: boolean
+          github_branch?: string
+          github_repo?: string | null
+          id?: string
+          last_checked_at?: string | null
+          last_commit_sha?: string | null
+          last_health_status?: string | null
+          last_response_time_ms?: number | null
+          last_status_code?: number | null
+          last_sync_at?: string | null
+          last_sync_status?: string | null
+          mirror_path?: string | null
+          name?: string
+          notes?: string | null
+          origin_server?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       monitored_sites: {
         Row: {
           alert_email: string | null
@@ -388,6 +454,82 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      site_health_history: {
+        Row: {
+          checked_at: string
+          error_message: string | null
+          id: string
+          is_up: boolean
+          response_time_ms: number | null
+          site_id: string
+          status_code: number | null
+        }
+        Insert: {
+          checked_at?: string
+          error_message?: string | null
+          id?: string
+          is_up: boolean
+          response_time_ms?: number | null
+          site_id: string
+          status_code?: number | null
+        }
+        Update: {
+          checked_at?: string
+          error_message?: string | null
+          id?: string
+          is_up?: boolean
+          response_time_ms?: number | null
+          site_id?: string
+          status_code?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_health_history_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "managed_sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_sync_log: {
+        Row: {
+          commit_sha: string | null
+          created_at: string
+          duration_ms: number | null
+          id: string
+          message: string | null
+          site_id: string
+          status: string
+        }
+        Insert: {
+          commit_sha?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          id?: string
+          message?: string | null
+          site_id: string
+          status: string
+        }
+        Update: {
+          commit_sha?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          id?: string
+          message?: string | null
+          site_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_sync_log_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "managed_sites"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {
