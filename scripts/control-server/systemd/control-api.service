@@ -1,0 +1,23 @@
+[Unit]
+Description=Nexus Control API
+After=network.target
+
+[Service]
+Type=simple
+User=nexus
+Group=nexus
+WorkingDirectory=/srv/control-api
+EnvironmentFile=/srv/control-api/.env
+ExecStart=/usr/bin/node /srv/control-api/control-api.js
+Restart=always
+RestartSec=5
+StandardOutput=append:/var/log/control-api/out.log
+StandardError=append:/var/log/control-api/err.log
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -31,9 +31,11 @@ import { Route as AdminVisitsRouteImport } from './routes/admin.visits'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminProjectsRouteImport } from './routes/admin.projects'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
+import { Route as AdminControlCenterRouteImport } from './routes/admin.control-center'
 import { Route as AdminChecksRouteImport } from './routes/admin.checks'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as ApiPublicCronCheckProjectsRouteImport } from './routes/api.public.cron.check-projects'
+import { Route as ApiPublicControlHealthCheckRouteImport } from './routes/api.public.control.health-check'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -145,6 +147,11 @@ const AdminLeadsRoute = AdminLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminControlCenterRoute = AdminControlCenterRouteImport.update({
+  id: '/control-center',
+  path: '/control-center',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminChecksRoute = AdminChecksRouteImport.update({
   id: '/checks',
   path: '/checks',
@@ -159,6 +166,12 @@ const ApiPublicCronCheckProjectsRoute =
   ApiPublicCronCheckProjectsRouteImport.update({
     id: '/api/public/cron/check-projects',
     path: '/api/public/cron/check-projects',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicControlHealthCheckRoute =
+  ApiPublicControlHealthCheckRouteImport.update({
+    id: '/api/public/control/health-check',
+    path: '/api/public/control/health-check',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -181,12 +194,14 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
+  '/admin/control-center': typeof AdminControlCenterRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/api/public/control/health-check': typeof ApiPublicControlHealthCheckRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
 export interface FileRoutesByTo {
@@ -208,12 +223,14 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
+  '/admin/control-center': typeof AdminControlCenterRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/api/public/control/health-check': typeof ApiPublicControlHealthCheckRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
 export interface FileRoutesById {
@@ -236,12 +253,14 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
+  '/admin/control-center': typeof AdminControlCenterRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/api/public/control/health-check': typeof ApiPublicControlHealthCheckRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
 export interface FileRouteTypes {
@@ -265,12 +284,14 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/alerts'
     | '/admin/checks'
+    | '/admin/control-center'
     | '/admin/leads'
     | '/admin/projects'
     | '/admin/settings'
     | '/admin/visits'
     | '/marketplace/$slug'
     | '/projects/$slug'
+    | '/api/public/control/health-check'
     | '/api/public/cron/check-projects'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -292,12 +313,14 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/alerts'
     | '/admin/checks'
+    | '/admin/control-center'
     | '/admin/leads'
     | '/admin/projects'
     | '/admin/settings'
     | '/admin/visits'
     | '/marketplace/$slug'
     | '/projects/$slug'
+    | '/api/public/control/health-check'
     | '/api/public/cron/check-projects'
   id:
     | '__root__'
@@ -319,12 +342,14 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/alerts'
     | '/admin/checks'
+    | '/admin/control-center'
     | '/admin/leads'
     | '/admin/projects'
     | '/admin/settings'
     | '/admin/visits'
     | '/marketplace/$slug'
     | '/projects/$slug'
+    | '/api/public/control/health-check'
     | '/api/public/cron/check-projects'
   fileRoutesById: FileRoutesById
 }
@@ -345,6 +370,7 @@ export interface RootRouteChildren {
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  ApiPublicControlHealthCheckRoute: typeof ApiPublicControlHealthCheckRoute
   ApiPublicCronCheckProjectsRoute: typeof ApiPublicCronCheckProjectsRoute
 }
 
@@ -504,6 +530,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLeadsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/control-center': {
+      id: '/admin/control-center'
+      path: '/control-center'
+      fullPath: '/admin/control-center'
+      preLoaderRoute: typeof AdminControlCenterRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/checks': {
       id: '/admin/checks'
       path: '/checks'
@@ -525,12 +558,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronCheckProjectsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/control/health-check': {
+      id: '/api/public/control/health-check'
+      path: '/api/public/control/health-check'
+      fullPath: '/api/public/control/health-check'
+      preLoaderRoute: typeof ApiPublicControlHealthCheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AdminRouteChildren {
   AdminAlertsRoute: typeof AdminAlertsRoute
   AdminChecksRoute: typeof AdminChecksRoute
+  AdminControlCenterRoute: typeof AdminControlCenterRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminProjectsRoute: typeof AdminProjectsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -540,6 +581,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAlertsRoute: AdminAlertsRoute,
   AdminChecksRoute: AdminChecksRoute,
+  AdminControlCenterRoute: AdminControlCenterRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminProjectsRoute: AdminProjectsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
@@ -589,6 +631,7 @@ const rootRouteChildren: RootRouteChildren = {
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  ApiPublicControlHealthCheckRoute: ApiPublicControlHealthCheckRoute,
   ApiPublicCronCheckProjectsRoute: ApiPublicCronCheckProjectsRoute,
 }
 export const routeTree = rootRouteImport
