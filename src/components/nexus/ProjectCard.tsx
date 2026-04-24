@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowUpLeft, ExternalLink } from "lucide-react";
-import type { ProjectRow } from "@/hooks/use-projects";
+import type { PublicProjectRow } from "@/hooks/use-projects";
 import { getIcon, GLOW_MAP, type GlowKey } from "@/lib/icon-map";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -8,7 +8,7 @@ function logVisit(projectId: string) {
   supabase.rpc("log_project_visit", { _project_id: projectId }).then(() => {});
 }
 
-export function ProjectCard({ project, index = 0 }: { project: ProjectRow; index?: number }) {
+export function ProjectCard({ project, index = 0 }: { project: PublicProjectRow; index?: number }) {
   const Icon = getIcon(project.icon);
   const glow: GlowKey = (project.glow as GlowKey) in GLOW_MAP ? (project.glow as GlowKey) : "violet";
   const favicon = project.url && project.url !== "#"
