@@ -35,6 +35,7 @@ import { Route as AdminControlCenterRouteImport } from './routes/admin.control-c
 import { Route as AdminChecksRouteImport } from './routes/admin.checks'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as ApiPublicCronCheckProjectsRouteImport } from './routes/api.public.cron.check-projects'
+import { Route as ApiPublicControlSyncSiteRouteImport } from './routes/api.public.control.sync-site'
 import { Route as ApiPublicControlHealthCheckRouteImport } from './routes/api.public.control.health-check'
 
 const TermsRoute = TermsRouteImport.update({
@@ -168,6 +169,12 @@ const ApiPublicCronCheckProjectsRoute =
     path: '/api/public/cron/check-projects',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicControlSyncSiteRoute =
+  ApiPublicControlSyncSiteRouteImport.update({
+    id: '/api/public/control/sync-site',
+    path: '/api/public/control/sync-site',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicControlHealthCheckRoute =
   ApiPublicControlHealthCheckRouteImport.update({
     id: '/api/public/control/health-check',
@@ -202,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/api/public/control/health-check': typeof ApiPublicControlHealthCheckRoute
+  '/api/public/control/sync-site': typeof ApiPublicControlSyncSiteRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
 export interface FileRoutesByTo {
@@ -231,6 +239,7 @@ export interface FileRoutesByTo {
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/api/public/control/health-check': typeof ApiPublicControlHealthCheckRoute
+  '/api/public/control/sync-site': typeof ApiPublicControlSyncSiteRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
 export interface FileRoutesById {
@@ -261,6 +270,7 @@ export interface FileRoutesById {
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/api/public/control/health-check': typeof ApiPublicControlHealthCheckRoute
+  '/api/public/control/sync-site': typeof ApiPublicControlSyncSiteRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
 export interface FileRouteTypes {
@@ -292,6 +302,7 @@ export interface FileRouteTypes {
     | '/marketplace/$slug'
     | '/projects/$slug'
     | '/api/public/control/health-check'
+    | '/api/public/control/sync-site'
     | '/api/public/cron/check-projects'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -321,6 +332,7 @@ export interface FileRouteTypes {
     | '/marketplace/$slug'
     | '/projects/$slug'
     | '/api/public/control/health-check'
+    | '/api/public/control/sync-site'
     | '/api/public/cron/check-projects'
   id:
     | '__root__'
@@ -350,6 +362,7 @@ export interface FileRouteTypes {
     | '/marketplace/$slug'
     | '/projects/$slug'
     | '/api/public/control/health-check'
+    | '/api/public/control/sync-site'
     | '/api/public/cron/check-projects'
   fileRoutesById: FileRoutesById
 }
@@ -371,6 +384,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   ApiPublicControlHealthCheckRoute: typeof ApiPublicControlHealthCheckRoute
+  ApiPublicControlSyncSiteRoute: typeof ApiPublicControlSyncSiteRoute
   ApiPublicCronCheckProjectsRoute: typeof ApiPublicCronCheckProjectsRoute
 }
 
@@ -558,6 +572,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronCheckProjectsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/control/sync-site': {
+      id: '/api/public/control/sync-site'
+      path: '/api/public/control/sync-site'
+      fullPath: '/api/public/control/sync-site'
+      preLoaderRoute: typeof ApiPublicControlSyncSiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/control/health-check': {
       id: '/api/public/control/health-check'
       path: '/api/public/control/health-check'
@@ -632,6 +653,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   ApiPublicControlHealthCheckRoute: ApiPublicControlHealthCheckRoute,
+  ApiPublicControlSyncSiteRoute: ApiPublicControlSyncSiteRoute,
   ApiPublicCronCheckProjectsRoute: ApiPublicCronCheckProjectsRoute,
 }
 export const routeTree = rootRouteImport

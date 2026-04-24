@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import {
   Radar, Plus, RefreshCw, ExternalLink, Github, Globe2,
-  CheckCircle2, XCircle, Clock, Trash2, Power, PowerOff, Activity,
+  CheckCircle2, XCircle, Clock, Trash2, Power, PowerOff, Activity, GitBranch,
 } from "lucide-react";
 import { AdminGuard } from "@/components/nexus/AdminGuard";
 import { AdminLayout } from "@/components/admin/AdminLayout";
@@ -164,6 +164,25 @@ function ControlCenterPage() {
                   else flash(`✓ تم الحذف`);
                 }
               }}
+              onSync={async () => {
+                flash(`جارِ مزامنة "${site.name}"...`);
+                try {
+                  const res = await fetch("/api/public/control/sync-site", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ siteId: site.id }),
+                  });
+                  const json = await res.json();
+                  if (res.ok && json.ok) {
+                    flash(`✓ مزامنة "${site.name}" — ${(json.commit ?? "").slice(0, 7)}`);
+                    await refetch();
+                  } else {
+                    flash(`خطأ مزامنة: ${json.error ?? res.statusText}`);
+                  }
+                } catch (e) {
+                  flash(`خطأ: ${e instanceof Error ? e.message : "?"}`);
+                }
+              }}
             />
           ))}
         </div>
@@ -206,10 +225,12 @@ function SiteCard({
   site,
   onToggleEnabled,
   onDelete,
+  onSync,
 }: {
   site: ManagedSite;
   onToggleEnabled: () => void;
   onDelete: () => void;
+  onSync: () => void;
 }) {
   const status = site.last_health_status;
   const statusColor =
@@ -242,6 +263,15 @@ function SiteCard({
           </a>
         </div>
         <div className="flex shrink-0 gap-1">
+          {site.github_repo && (
+            <button
+              onClick={onSync}
+              title="مزامنة من GitHub"
+              className="rounded-lg p-1.5 text-muted-foreground hover:bg-[oklch(0.65_0.25_290)]/15 hover:text-foreground"
+            >
+              <GitBranch className="h-3.5 w-3.5" />
+            </button>
+          )}
           <button
             onClick={onToggleEnabled}
             title={site.enabled ? "تعطيل" : "تفعيل"}
