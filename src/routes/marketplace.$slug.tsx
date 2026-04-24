@@ -1,17 +1,42 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useParams } from "@tanstack/react-router";
 import { ArrowLeft, Check, Download, ExternalLink, Sparkles } from "lucide-react";
 import { useTemplate } from "@/hooks/use-templates";
 import { useCurrency } from "@/lib/currency";
 import { useI18n } from "@/lib/i18n";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/marketplace/$slug")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `${params.slug} — قالب نكسس` },
-      { name: "description", content: "قالب احترافي جاهز للنشر — كود مصدر كامل." },
-    ],
-  }),
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("templates")
+      .select("title_ar, title_en, description_ar, description_en, cover_image, slug")
+      .eq("slug", params.slug)
+      .eq("is_published", true)
+      .maybeSingle();
+    if (!data) throw notFound();
+    return { template: data };
+  },
+  head: ({ loaderData, params }) => {
+    const t = loaderData?.template;
+    const title = t ? `${t.title_ar ?? t.title_en} — قالب نكسس` : `${params.slug} — قالب نكسس`;
+    const desc = (t?.description_ar ?? t?.description_en ?? "قالب احترافي جاهز للنشر").toString().slice(0, 160);
+    const meta: Array<Record<string, string>> = [
+      { title },
+      { name: "description", content: desc },
+      { property: "og:title", content: title },
+      { property: "og:description", content: desc },
+      { property: "og:type", content: "product" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: desc },
+    ];
+    if (t?.cover_image) {
+      meta.push({ property: "og:image", content: t.cover_image });
+      meta.push({ name: "twitter:image", content: t.cover_image });
+    }
+    return { meta };
+  },
   notFoundComponent: () => {
     const { slug } = Route.useParams();
     return (

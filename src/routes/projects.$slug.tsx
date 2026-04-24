@@ -1,15 +1,36 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import { useProjects } from "@/hooks/use-projects";
 import { getIcon, GLOW_MAP, type GlowKey } from "@/lib/icon-map";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/projects/$slug")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `${params.slug} — نكسس` },
-      { name: "description", content: "تفاصيل المشروع" },
-    ],
-  }),
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("projects_public" as "projects")
+      .select("name, name_ar, description, description_ar, category_label, slug, url")
+      .eq("slug", params.slug)
+      .maybeSingle();
+    if (!data) throw notFound();
+    return { project: data };
+  },
+  head: ({ loaderData, params }) => {
+    const p = loaderData?.project;
+    const title = p ? `${p.name_ar ?? p.name} — نكسس` : `${params.slug} — نكسس`;
+    const desc = (p?.description_ar ?? p?.description ?? `تفاصيل مشروع ${params.slug}`).toString().slice(0, 160);
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+      ],
+    };
+  },
   notFoundComponent: () => (
     <div className="mx-auto max-w-md px-6 pt-40 text-center">
       <h1 className="font-display text-3xl font-bold">المشروع غير موجود</h1>
