@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import {
   Radar, Plus, RefreshCw, ExternalLink, Github, Globe2,
-  CheckCircle2, XCircle, Clock, Trash2, Power, PowerOff, Activity,
+  CheckCircle2, XCircle, Clock, Trash2, Power, PowerOff, Activity, GitBranch,
 } from "lucide-react";
 import { AdminGuard } from "@/components/nexus/AdminGuard";
 import { AdminLayout } from "@/components/admin/AdminLayout";
@@ -162,6 +162,25 @@ function ControlCenterPage() {
                   const { error } = await deleteSite(site.id);
                   if (error) flash(`خطأ: ${error.message}`);
                   else flash(`✓ تم الحذف`);
+                }
+              }}
+              onSync={async () => {
+                flash(`جارِ مزامنة "${site.name}"...`);
+                try {
+                  const res = await fetch("/api/public/control/sync-site", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ siteId: site.id }),
+                  });
+                  const json = await res.json();
+                  if (res.ok && json.ok) {
+                    flash(`✓ مزامنة "${site.name}" — ${(json.commit ?? "").slice(0, 7)}`);
+                    await refetch();
+                  } else {
+                    flash(`خطأ مزامنة: ${json.error ?? res.statusText}`);
+                  }
+                } catch (e) {
+                  flash(`خطأ: ${e instanceof Error ? e.message : "?"}`);
                 }
               }}
             />
