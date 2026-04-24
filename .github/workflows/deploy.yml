@@ -10,22 +10,80 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Validate required secrets
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+        run: |
+          missing=0
+          for name in SERVER_HOST SERVER_USER SERVER_PORT SERVER_SSH_KEY; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Required secret $name is empty or not set"
+              missing=1
+            else
+              echo "✅ $name is set"
+            fi
+          done
+          if [ "$missing" -eq 1 ]; then
+            echo "::error::Add missing secrets at: Settings → Secrets and variables → Actions"
+            exit 1
+          fi
+
+      - name: Deploy via SSH (with auto-retry)
+        uses: nick-fields/retry@v3
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          port: ${{ secrets.SERVER_PORT }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            set -e
+          timeout_minutes: 8
+          max_attempts: 3
+          retry_wait_seconds: 30
+          retry_on: error
+          command: |
+            set -eo pipefail
+
+            # Prepare a private temp dir for the SSH key
+            SSH_DIR="$(mktemp -d)"
+            trap 'rm -rf "$SSH_DIR"' EXIT
+            KEY_FILE="$SSH_DIR/id_deploy"
+            KNOWN_HOSTS="$SSH_DIR/known_hosts"
+
+            printf '%s\n' "$SERVER_SSH_KEY" > "$KEY_FILE"
+            chmod 600 "$KEY_FILE"
+
+            # Pre-populate known_hosts to avoid interactive prompt
+            ssh-keyscan -p "$SERVER_PORT" -H "$SERVER_HOST" > "$KNOWN_HOSTS" 2>/dev/null || true
+
+            echo ">> [$(date -u +%H:%M:%S)] Connecting to $SERVER_USER@$SERVER_HOST:$SERVER_PORT ..."
+
+            ssh \
+              -i "$KEY_FILE" \
+              -p "$SERVER_PORT" \
+              -o UserKnownHostsFile="$KNOWN_HOSTS" \
+              -o StrictHostKeyChecking=accept-new \
+              -o ConnectTimeout=20 \
+              -o ServerAliveInterval=15 \
+              -o ServerAliveCountMax=4 \
+              "$SERVER_USER@$SERVER_HOST" \
+              'bash -s' << 'REMOTE_SCRIPT'
+            set -eo pipefail
+            ts() { date -u +%H:%M:%S; }
+
             cd ~/app
-            echo ">> Pulling latest code from main..."
+            echo ">> [$(ts)] Pulling latest code from main..."
             git fetch origin main
             git reset --hard origin/main
-            echo ">> Rebuilding and restarting containers..."
+
+            echo ">> [$(ts)] Rebuilding and restarting containers..."
             docker compose up -d --build
-            echo ">> Cleaning up old images..."
+
+            echo ">> [$(ts)] Cleaning up old images..."
             docker image prune -f
-            echo ">> Done. Current containers:"
+
+            echo ">> [$(ts)] ✅ Deployment complete. Current containers:"
             docker compose ps
+            REMOTE_SCRIPT
