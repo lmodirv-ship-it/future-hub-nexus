@@ -54,24 +54,40 @@ export const Route = createFileRoute("/api/public/cron/check-projects")({
     handlers: {
       POST: async () => {
         try {
+          const expected = process.env.CRON_SECRET;
+          if (!expected) {
+            console.error("CRON_SECRET not configured");
+            return new Response(JSON.stringify({ ok: false, error: "Internal error" }), {
+              status: 500, headers: { "Content-Type": "application/json" },
+            });
+          }
           const results = await runCheck();
           return new Response(JSON.stringify({ ok: true, checked: results.length }), {
             status: 200, headers: { "Content-Type": "application/json" },
           });
         } catch (e) {
-          return new Response(JSON.stringify({ ok: false, error: e instanceof Error ? e.message : String(e) }), {
+          console.error("cron check-projects error:", e);
+          return new Response(JSON.stringify({ ok: false, error: "Internal error" }), {
             status: 500, headers: { "Content-Type": "application/json" },
           });
         }
       },
       GET: async () => {
         try {
+          const expected = process.env.CRON_SECRET;
+          if (!expected) {
+            console.error("CRON_SECRET not configured");
+            return new Response(JSON.stringify({ ok: false, error: "Internal error" }), {
+              status: 500, headers: { "Content-Type": "application/json" },
+            });
+          }
           const results = await runCheck();
           return new Response(JSON.stringify({ ok: true, checked: results.length }), {
             status: 200, headers: { "Content-Type": "application/json" },
           });
         } catch (e) {
-          return new Response(JSON.stringify({ ok: false, error: e instanceof Error ? e.message : String(e) }), {
+          console.error("cron check-projects error:", e);
+          return new Response(JSON.stringify({ ok: false, error: "Internal error" }), {
             status: 500, headers: { "Content-Type": "application/json" },
           });
         }
