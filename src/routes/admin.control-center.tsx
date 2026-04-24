@@ -225,10 +225,12 @@ function SiteCard({
   site,
   onToggleEnabled,
   onDelete,
+  onSync,
 }: {
   site: ManagedSite;
   onToggleEnabled: () => void;
   onDelete: () => void;
+  onSync: () => void;
 }) {
   const status = site.last_health_status;
   const statusColor =
@@ -261,6 +263,15 @@ function SiteCard({
           </a>
         </div>
         <div className="flex shrink-0 gap-1">
+          {site.github_repo && (
+            <button
+              onClick={onSync}
+              title="مزامنة من GitHub"
+              className="rounded-lg p-1.5 text-muted-foreground hover:bg-[oklch(0.65_0.25_290)]/15 hover:text-foreground"
+            >
+              <GitBranch className="h-3.5 w-3.5" />
+            </button>
+          )}
           <button
             onClick={onToggleEnabled}
             title={site.enabled ? "تعطيل" : "تفعيل"}
