@@ -7,17 +7,28 @@
 ## 📋 المعمارية
 
 ```
-Lovable (تطوير) → GitHub (تخزين الكود) → GitHub Actions → سيرفرك (إنتاج)
-                                                              │
-                                                  ┌───────────┴───────────┐
-                                                  │  Nginx (المنفذ 80)    │
-                                                  │      ↓                │
-                                                  │  Wrangler (المنفذ 3000)│
-                                                  │  (worker bundle)      │
-                                                  │      ↓                │
-                                                  │  Lovable Cloud (DB)   │
-                                                  └───────────────────────┘
+Lovable (تطوير)
+    ↓
+GitHub (تخزين الكود) ──[Mirror اختياري]──▶ GitLab CE (LWS - نسخة احتياطية)
+    ↓
+GitHub Actions
+    ↓
+سيرفر الإنتاج (Docker + Nginx + Wrangler)
+    ↓
+Lovable Cloud (قاعدة البيانات)
 ```
+
+### 🦊 GitLab CE (نسخة احتياطية اختيارية)
+
+يمكن إضافة نسخة احتياطية حية للكود على سيرفر GitLab CE خاص بك على LWS. هذا **اختياري** ولا يؤثر على الإنتاج.
+
+- **سيرفر الإنتاج:** يبقى كما هو (Docker + Nginx + Wrangler)
+- **سيرفر LWS الجديد:** GitLab CE فقط (نسخة احتياطية)
+- **GitHub Actions:** يستمر بالنشر إلى الإنتاج بدون تغيير
+
+📖 **أدلة الإعداد:**
+- [دليل تثبيت GitLab CE](./docs/GITLAB_SETUP_AR.md)
+- [إعداد Mirror من GitHub](./docs/GITLAB_MIRROR_AR.md)
 
 > **ملاحظة تقنية**: المشروع مبني لـ Cloudflare Workers (هذا ما يولّده `vite build`).
 > داخل الحاوية نشغّله بـ **Wrangler** في وضع `--local` (يستخدم محرك `workerd`).
