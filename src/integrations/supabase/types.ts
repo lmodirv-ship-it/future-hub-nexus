@@ -68,6 +68,13 @@ export type Database = {
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "alerts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       monitored_sites: {
@@ -214,6 +221,13 @@ export type Database = {
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "project_checks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       project_visits: {
@@ -244,6 +258,13 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_visits_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects_public"
             referencedColumns: ["id"]
           },
         ]
@@ -537,6 +558,13 @@ export type Database = {
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "templates_source_project_id_fkey"
+            columns: ["source_project_id"]
+            isOneToOne: false
+            referencedRelation: "projects_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -562,7 +590,78 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      projects_public: {
+        Row: {
+          category: string | null
+          category_label: string | null
+          created_at: string | null
+          description: string | null
+          description_ar: string | null
+          glow: string | null
+          icon: string | null
+          id: string | null
+          is_featured: boolean | null
+          is_up: boolean | null
+          last_checked_at: string | null
+          last_response_time_ms: number | null
+          last_status_code: number | null
+          name: string | null
+          name_ar: string | null
+          slug: string | null
+          sort_order: number | null
+          status: string | null
+          updated_at: string | null
+          url: string | null
+          visit_count: number | null
+        }
+        Insert: {
+          category?: string | null
+          category_label?: string | null
+          created_at?: string | null
+          description?: string | null
+          description_ar?: string | null
+          glow?: string | null
+          icon?: string | null
+          id?: string | null
+          is_featured?: boolean | null
+          is_up?: boolean | null
+          last_checked_at?: string | null
+          last_response_time_ms?: number | null
+          last_status_code?: number | null
+          name?: string | null
+          name_ar?: string | null
+          slug?: string | null
+          sort_order?: number | null
+          status?: string | null
+          updated_at?: string | null
+          url?: string | null
+          visit_count?: number | null
+        }
+        Update: {
+          category?: string | null
+          category_label?: string | null
+          created_at?: string | null
+          description?: string | null
+          description_ar?: string | null
+          glow?: string | null
+          icon?: string | null
+          id?: string | null
+          is_featured?: boolean | null
+          is_up?: boolean | null
+          last_checked_at?: string | null
+          last_response_time_ms?: number | null
+          last_status_code?: number | null
+          name?: string | null
+          name_ar?: string | null
+          slug?: string | null
+          sort_order?: number | null
+          status?: string | null
+          updated_at?: string | null
+          url?: string | null
+          visit_count?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_dashboard_stats: { Args: never; Returns: Json }
