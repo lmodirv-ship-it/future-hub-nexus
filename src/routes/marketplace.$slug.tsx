@@ -12,6 +12,22 @@ export const Route = createFileRoute("/marketplace/$slug")({
       { name: "description", content: "قالب احترافي جاهز للنشر — كود مصدر كامل." },
     ],
   }),
+  notFoundComponent: () => {
+    const { slug } = Route.useParams();
+    return (
+      <div className="mx-auto max-w-md px-6 pt-40 text-center">
+        <h1 className="font-display text-3xl font-bold">القالب غير موجود</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{slug}</p>
+        <Link to="/marketplace" className="mt-4 inline-block text-[oklch(0.85_0.18_200)]">عودة للسوق</Link>
+      </div>
+    );
+  },
+  errorComponent: ({ error, reset }) => (
+    <div className="mx-auto max-w-md px-6 pt-40 text-center">
+      <p className="text-destructive">{error.message}</p>
+      <button onClick={reset} className="mt-4 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm">إعادة المحاولة</button>
+    </div>
+  ),
   component: TemplateDetail,
 });
 
