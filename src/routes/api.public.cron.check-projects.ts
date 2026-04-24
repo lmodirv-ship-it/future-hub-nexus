@@ -49,49 +49,52 @@ async function runCheck() {
   return results;
 }
 
+function timingSafeEqualStr(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return mismatch === 0;
+}
+
+function authorize(request: Request): Response | null {
+  const expected = process.env.CRON_SECRET;
+  if (!expected) {
+    console.error("CRON_SECRET not configured");
+    return new Response(JSON.stringify({ ok: false, error: "Internal error" }), {
+      status: 500, headers: { "Content-Type": "application/json" },
+    });
+  }
+  const header = request.headers.get("authorization") ?? "";
+  const token = header.startsWith("Bearer ") ? header.slice(7) : "";
+  if (!token || !timingSafeEqualStr(token, expected)) {
+    return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), {
+      status: 401, headers: { "Content-Type": "application/json" },
+    });
+  }
+  return null;
+}
+
+async function handle(request: Request): Promise<Response> {
+  const denied = authorize(request);
+  if (denied) return denied;
+  try {
+    const results = await runCheck();
+    return new Response(JSON.stringify({ ok: true, checked: results.length }), {
+      status: 200, headers: { "Content-Type": "application/json" },
+    });
+  } catch (e) {
+    console.error("cron check-projects error:", e);
+    return new Response(JSON.stringify({ ok: false, error: "Internal error" }), {
+      status: 500, headers: { "Content-Type": "application/json" },
+    });
+  }
+}
+
 export const Route = createFileRoute("/api/public/cron/check-projects")({
   server: {
     handlers: {
-      POST: async () => {
-        try {
-          const expected = process.env.CRON_SECRET;
-          if (!expected) {
-            console.error("CRON_SECRET not configured");
-            return new Response(JSON.stringify({ ok: false, error: "Internal error" }), {
-              status: 500, headers: { "Content-Type": "application/json" },
-            });
-          }
-          const results = await runCheck();
-          return new Response(JSON.stringify({ ok: true, checked: results.length }), {
-            status: 200, headers: { "Content-Type": "application/json" },
-          });
-        } catch (e) {
-          console.error("cron check-projects error:", e);
-          return new Response(JSON.stringify({ ok: false, error: "Internal error" }), {
-            status: 500, headers: { "Content-Type": "application/json" },
-          });
-        }
-      },
-      GET: async () => {
-        try {
-          const expected = process.env.CRON_SECRET;
-          if (!expected) {
-            console.error("CRON_SECRET not configured");
-            return new Response(JSON.stringify({ ok: false, error: "Internal error" }), {
-              status: 500, headers: { "Content-Type": "application/json" },
-            });
-          }
-          const results = await runCheck();
-          return new Response(JSON.stringify({ ok: true, checked: results.length }), {
-            status: 200, headers: { "Content-Type": "application/json" },
-          });
-        } catch (e) {
-          console.error("cron check-projects error:", e);
-          return new Response(JSON.stringify({ ok: false, error: "Internal error" }), {
-            status: 500, headers: { "Content-Type": "application/json" },
-          });
-        }
-      },
+      POST: async ({ request }) => handle(request),
+      GET: async ({ request }) => handle(request),
     },
   },
 });
