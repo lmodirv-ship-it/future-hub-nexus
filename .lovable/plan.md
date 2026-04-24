@@ -1,49 +1,44 @@
-## خطة إصلاح خطأ Docker الحالي
+## الهدف
+إضافة إعادة محاولة تلقائية لعملية النشر عبر SSH في `.github/workflows/deploy.yml`، مع تحقق مسبق من الـ secrets و logging محسّن لتشخيص أسرع.
 
-سأحوّل إعداد النشر الذاتي ليبني ويشغّل التطبيق بالطريقة الصحيحة لهذا المشروع، لأن `Dockerfile` الحالي يفترض وجود مجلد `.output` بينما المشروع مضبوط حالياً على مخرجات استضافة مختلفة.
+## التغييرات
 
-### ما الذي سأعدّله
-1. **تصحيح إعداد البناء في `vite.config.ts`**
-   - إضافة إعداد واضح يسمح ببناء نسخة مخصّصة لـ Node عند التشغيل داخل Docker.
-   - إبقاء الإعداد الحالي مناسباً للمعاينة/النشر الحالي حتى لا ينكسر المشروع خارج Docker.
+### تعديل `.github/workflows/deploy.yml`
 
-2. **تصحيح `Dockerfile`**
-   - إزالة الافتراض الخاطئ بأن المخرجات ستكون داخل `/app/.output`.
-   - تحديث أوامر `COPY` و `CMD` لتطابق المخرج الحقيقي بعد ضبط البناء.
-   - الإبقاء على تمرير متغيرات `VITE_*` اللازمة للبناء.
+استبدال المحتوى الحالي بنسخة محسّنة تتضمن:
 
-3. **مراجعة `docker-compose.yml` و `nginx/nginx.conf`**
-   - التأكد أن المنفذ الداخلي والتوجيه عبر Nginx يظلان صحيحين بعد تصحيح طريقة التشغيل.
-   - عدم تغيير شيء غير ضروري إذا كانت هذه الملفات سليمة.
+1. **خطوة تحقق مسبق من الـ secrets** (`Validate required secrets`):
+   - تتأكد من وجود `SERVER_HOST`, `SERVER_USER`, `SERVER_PORT`, `SERVER_SSH_KEY`
+   - تعطي رسالة خطأ واضحة فوراً (`::error::SECRET_NAME is empty`) بدلاً من الفشل المبهم لاحقاً
 
-4. **تحديث دليل النشر `DEPLOY.md`**
-   - إزالة التعليمات التي توحي بأن `.output` مضمون دائماً.
-   - إضافة خطوات تحقق مختصرة بعد البناء حتى تعرف بسرعة إن كان التشغيل نجح.
+2. **استخدام `nick-fields/retry@v3`** بدلاً من `appleboy/ssh-action@v1.0.3`:
+   - `max_attempts: 3` — حتى 3 محاولات
+   - `timeout_minutes: 8` لكل محاولة
+   - `retry_wait_seconds: 30` بين المحاولات
+   - `retry_on: error` — إعادة المحاولة على أي فشل (بما فيه فشل SSH handshake)
 
-5. **التحقق النهائي**
-   - التأكد أن المسار المتوقع يصبح:
-```text
-GitHub -> Docker build -> Node runtime داخل الحاوية -> Nginx :80
-```
-   - وبعدها أعطيك أوامر التنفيذ النهائية على السيرفر خطوة بخطوة.
+3. **تنفيذ SSH مباشر** داخل الـ retry action:
+   - كتابة المفتاح الخاص لملف مؤقت بصلاحيات `600`
+   - `ssh-keyscan` تلقائي لإضافة الـ host لـ `known_hosts`
+   - `StrictHostKeyChecking=accept-new` و `ConnectTimeout=20`
+   - `set -eo pipefail` داخل السكربت البعيد للفشل المبكر
 
-## سبب الخطأ الحالي
-- `Dockerfile` الحالي يعتمد على:
-  - `COPY --from=builder /app/.output ./.output`
-  - `CMD ["node", ".output/server/index.mjs"]`
-- لكن هذا المشروع يستخدم إعداد TanStack Start مهيأ افتراضياً للاستضافة الحالية، وليس هناك ما يضمن إنشاء `.output` بهذا الشكل.
-- لذلك مرحلة `runner` تفشل لأن الملف/المجلد المطلوب غير موجود أصلاً.
+4. **Logging محسّن** مع timestamps لكل خطوة على السيرفر:
+   - `>> [HH:MM:SS] Pulling latest code...`
+   - `>> [HH:MM:SS] Rebuilding containers...`
+   - `>> [HH:MM:SS] Cleaning old images...`
+   - `>> [HH:MM:SS] ✅ Done`
+   - متبوعة بـ `docker compose ps`
 
-## التفاصيل التقنية
-- الملف `vite.config.ts` حالياً يستخدم `defineConfig()` بدون تخصيص.
-- `package.json` يبني عبر `vite build` فقط.
-- `wrangler.jsonc` يوضح أن المشروع مهيأ أيضاً لبيئة Worker.
-- لذلك سأضيف **تمييزاً بين build Docker وbuild البيئة الحالية** بدلاً من الاعتماد على `NITRO_PRESET=node-server` وحده.
+## الفائدة
+- ✅ يحل المشاكل العابرة (network glitch, sshd restart, rate limiting) تلقائياً
+- ✅ رسائل خطأ واضحة عند نقص secret
+- ✅ تشخيص أسرع عبر timestamps
+- ✅ يحافظ على نفس السلوك الوظيفي (git pull + docker compose up --build + image prune)
 
-## النتيجة المتوقعة بعد التنفيذ
-- `docker compose up -d --build` ينجح.
-- تختفي رسالة الخطأ الخاصة بـ `/app/.output: not found`.
-- الحاوية `app` تعمل فعلياً ويمكن لـ Nginx تمرير الطلبات إليها.
-- أزوّدك بعدها بأوامر قصيرة فقط لإعادة البناء والتأكد من التشغيل.
+## ⚠️ تنبيه
+إعادة المحاولة لن تحل مشكلة **مفتاح خاطئ أساساً**. لو الـ `SERVER_SSH_KEY` في GitHub لا يطابق `~/.ssh/authorized_keys` على الـ VPS، الـ 3 محاولات ستفشل جميعاً. يجب أولاً التأكد من تحديث `SERVER_SSH_KEY` بالمحتوى الكامل لـ `~/.ssh/github_deploy` كما ناقشنا سابقاً.
 
-إذا وافقت، سأبدأ بتطبيق هذا الإصلاح مباشرة.
+## ملفات لن تتغير
+- لا تغييرات على الكود، الـ Dockerfile، أو إعدادات الـ Supabase
+- التعديل محصور في ملف واحد: `.github/workflows/deploy.yml`
