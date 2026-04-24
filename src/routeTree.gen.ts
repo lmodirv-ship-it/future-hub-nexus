@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as PricingRouteImport } from './routes/pricing'
@@ -30,6 +31,11 @@ import { Route as AdminChecksRouteImport } from './routes/admin.checks'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as ApiPublicCronCheckProjectsRouteImport } from './routes/api.public.cron.check-projects'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
@@ -144,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
   '/admin/leads': typeof AdminLeadsRoute
@@ -166,6 +173,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
   '/admin/leads': typeof AdminLeadsRoute
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
   '/admin/leads': typeof AdminLeadsRoute
@@ -213,6 +222,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/projects'
     | '/services'
+    | '/terms'
     | '/admin/alerts'
     | '/admin/checks'
     | '/admin/leads'
@@ -235,6 +245,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/projects'
     | '/services'
+    | '/terms'
     | '/admin/alerts'
     | '/admin/checks'
     | '/admin/leads'
@@ -257,6 +268,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/projects'
     | '/services'
+    | '/terms'
     | '/admin/alerts'
     | '/admin/checks'
     | '/admin/leads'
@@ -280,11 +292,19 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   ProjectsRoute: typeof ProjectsRouteWithChildren
   ServicesRoute: typeof ServicesRoute
+  TermsRoute: typeof TermsRoute
   ApiPublicCronCheckProjectsRoute: typeof ApiPublicCronCheckProjectsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services': {
       id: '/services'
       path: '/services'
@@ -484,6 +504,7 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   ProjectsRoute: ProjectsRouteWithChildren,
   ServicesRoute: ServicesRoute,
+  TermsRoute: TermsRoute,
   ApiPublicCronCheckProjectsRoute: ApiPublicCronCheckProjectsRoute,
 }
 export const routeTree = rootRouteImport
