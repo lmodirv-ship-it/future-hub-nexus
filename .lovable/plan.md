@@ -1,44 +1,148 @@
-## الهدف
-إضافة إعادة محاولة تلقائية لعملية النشر عبر SSH في `.github/workflows/deploy.yml`، مع تحقق مسبق من الـ secrets و logging محسّن لتشخيص أسرع.
+# 🦊 خطة تثبيت GitLab CE على سيرفر LWS + Mirror من GitHub
 
-## التغييرات
+## 🎯 الهدف
+إنشاء نسخة احتياطية كاملة للكود على سيرفر LWS الجديد عبر GitLab CE، مع مزامنة تلقائية من GitHub، **بدون أي تأثير على الإنتاج الحالي**.
 
-### تعديل `.github/workflows/deploy.yml`
+---
 
-استبدال المحتوى الحالي بنسخة محسّنة تتضمن:
+## 📊 المعمارية النهائية
 
-1. **خطوة تحقق مسبق من الـ secrets** (`Validate required secrets`):
-   - تتأكد من وجود `SERVER_HOST`, `SERVER_USER`, `SERVER_PORT`, `SERVER_SSH_KEY`
-   - تعطي رسالة خطأ واضحة فوراً (`::error::SECRET_NAME is empty`) بدلاً من الفشل المبهم لاحقاً
+```
+Lovable (تطوير)
+    ↓
+GitHub (المصدر الرسمي) ──Mirror──▶ GitLab CE (LWS - النسخة الاحتياطية)
+    ↓
+GitHub Actions
+    ↓
+سيرفر الإنتاج الحالي (التطبيق على Docker) — يبقى كما هو
+```
 
-2. **استخدام `nick-fields/retry@v3`** بدلاً من `appleboy/ssh-action@v1.0.3`:
-   - `max_attempts: 3` — حتى 3 محاولات
-   - `timeout_minutes: 8` لكل محاولة
-   - `retry_wait_seconds: 30` بين المحاولات
-   - `retry_on: error` — إعادة المحاولة على أي فشل (بما فيه فشل SSH handshake)
+| السيرفر | الدور | الحالة |
+|---------|-------|--------|
+| LWS الجديد (8GB / Ubuntu 24.04) | GitLab CE + Runner | 🆕 سيُثبَّت |
+| سيرفر الإنتاج الحالي | التطبيق (Docker + Nginx + Wrangler) | ✅ بدون تغيير |
 
-3. **تنفيذ SSH مباشر** داخل الـ retry action:
-   - كتابة المفتاح الخاص لملف مؤقت بصلاحيات `600`
-   - `ssh-keyscan` تلقائي لإضافة الـ host لـ `known_hosts`
-   - `StrictHostKeyChecking=accept-new` و `ConnectTimeout=20`
-   - `set -eo pipefail` داخل السكربت البعيد للفشل المبكر
+---
 
-4. **Logging محسّن** مع timestamps لكل خطوة على السيرفر:
-   - `>> [HH:MM:SS] Pulling latest code...`
-   - `>> [HH:MM:SS] Rebuilding containers...`
-   - `>> [HH:MM:SS] Cleaning old images...`
-   - `>> [HH:MM:SS] ✅ Done`
-   - متبوعة بـ `docker compose ps`
+## 📂 الملفات التي ستُنشأ في المشروع
 
-## الفائدة
-- ✅ يحل المشاكل العابرة (network glitch, sshd restart, rate limiting) تلقائياً
-- ✅ رسائل خطأ واضحة عند نقص secret
-- ✅ تشخيص أسرع عبر timestamps
-- ✅ يحافظ على نفس السلوك الوظيفي (git pull + docker compose up --build + image prune)
+### سكريبتات قابلة للتنفيذ على سيرفر LWS
 
-## ⚠️ تنبيه
-إعادة المحاولة لن تحل مشكلة **مفتاح خاطئ أساساً**. لو الـ `SERVER_SSH_KEY` في GitHub لا يطابق `~/.ssh/authorized_keys` على الـ VPS، الـ 3 محاولات ستفشل جميعاً. يجب أولاً التأكد من تحديث `SERVER_SSH_KEY` بالمحتوى الكامل لـ `~/.ssh/github_deploy` كما ناقشنا سابقاً.
+1. **`scripts/install-gitlab.sh`**
+   - تحديث Ubuntu 24.04 + تثبيت dependencies (curl, ca-certificates, tzdata, perl, postfix)
+   - إعداد UFW firewall (يفتح 22, 80, 443 فقط)
+   - إضافة GitLab Omnibus repository الرسمي
+   - تثبيت `gitlab-ce` بأحدث إصدار مستقر يدعم Ubuntu 24.04
+   - تكوين `external_url` بـ `https://gitlab.slavacall-hiba.online`
+   - تشغيل `gitlab-ctl reconfigure`
+   - عرض كلمة مرور root الأولية من `/etc/gitlab/initial_root_password`
 
-## ملفات لن تتغير
-- لا تغييرات على الكود، الـ Dockerfile، أو إعدادات الـ Supabase
-- التعديل محصور في ملف واحد: `.github/workflows/deploy.yml`
+2. **`scripts/setup-gitlab-ssl.sh`**
+   - تفعيل Let's Encrypt المدمج في GitLab Omnibus
+   - تكوين تجديد تلقائي شهري
+   - إعادة تشغيل آمنة لـ NGINX داخل GitLab
+
+3. **`scripts/secure-gitlab.sh`**
+   - تعطيل تسجيل المستخدمين العام (`signup_enabled = false`)
+   - تفعيل 2FA enforcement (اختياري)
+   - تكوين session timeout
+
+4. **`scripts/install-gitlab-runner.sh`**
+   - تثبيت GitLab Runner (Docker executor)
+   - تعليمات التسجيل التفاعلي (للاستخدام المستقبلي عند تفعيل CI/CD)
+
+5. **`scripts/verify-gitlab-mirror.sh`**
+   - يقارن آخر commit بين GitHub و GitLab عبر API
+   - مفيد للتحقق من سلامة المزامنة
+
+### أدلة بالعربية
+
+6. **`docs/GITLAB_SETUP_AR.md`** — دليل تثبيت كامل خطوة بخطوة:
+   - قبل البدء (DNS A Record لـ `gitlab.slavacall-hiba.online`)
+   - تشغيل السكريبتات بالترتيب الصحيح
+   - تسجيل الدخول الأول وتغيير كلمة root
+   - إنشاء مستخدمك الشخصي
+   - استكشاف الأخطاء الشائعة
+
+7. **`docs/GITLAB_MIRROR_AR.md`** — دليل إعداد Mirror:
+   - إنشاء Personal Access Token في GitLab (`write_repository`)
+   - إنشاء مشروع فارغ في GitLab باسم `future-hub-nexus`
+   - إعداد Push Mirror في GitHub: `Settings → Code & automation → Mirroring repositories`
+   - الصيغة الصحيحة لـ URL: `https://oauth2:<TOKEN>@gitlab.slavacall-hiba.online/<user>/future-hub-nexus.git`
+   - اختبار + تأكيد المزامنة
+
+### تحديث
+
+8. **`DEPLOY.md`** — إضافة قسم جديد:
+   - شرح المعمارية الجديدة (سيرفران منفصلان)
+   - رابط للأدلة الجديدة
+   - توضيح أن GitHub Actions الحالي يبقى يعمل
+
+---
+
+## ❌ ما لن يتأثر إطلاقاً
+
+- ✅ كود التطبيق (React, TanStack Start)
+- ✅ قاعدة البيانات (Lovable Cloud / Supabase)
+- ✅ سيرفر الإنتاج الحالي
+- ✅ GitHub Actions الحالي (`.github/workflows/deploy.yml`)
+- ✅ Docker setup, Nginx config
+- ✅ التطبيق المباشر على `slavacall-hiba.online`
+
+---
+
+## 📋 ما يجب على المستخدم فعله بعد التنفيذ
+
+### قبل تشغيل السكريبتات (في لوحة DNS):
+1. إضافة A Record: `gitlab.slavacall-hiba.online` → IP سيرفر LWS الجديد
+2. انتظار 5-30 دقيقة لانتشار DNS
+3. تحقق: `dig gitlab.slavacall-hiba.online +short`
+
+### على سيرفر LWS الجديد (SSH كـ root):
+```bash
+# 1. استنساخ السكريبتات
+git clone https://github.com/lmodirv-ship-it/future-hub-nexus.git /tmp/nexus
+cd /tmp/nexus/scripts
+
+# 2. التثبيت بالترتيب
+sudo bash install-gitlab.sh
+sudo bash setup-gitlab-ssl.sh
+sudo bash secure-gitlab.sh
+
+# 3. (اختياري لاحقاً)
+sudo bash install-gitlab-runner.sh
+```
+
+### في GitHub (بعد تثبيت GitLab):
+- اتباع `docs/GITLAB_MIRROR_AR.md` لإعداد Push Mirror
+
+---
+
+## 🔒 الأمان المضمّن
+
+- UFW firewall: 22 / 80 / 443 فقط
+- SSL تلقائي عبر Let's Encrypt (HTTPS إجباري)
+- تعطيل التسجيل العام
+- تجديد شهادات تلقائي
+- تحذير صريح بتغيير كلمة root الأولية
+
+---
+
+## ⏭️ المراحل المؤجلة (لاحقاً عند الحاجة)
+
+- **GitLab CI/CD** كبديل لـ GitHub Actions — جاهز للتفعيل لاحقاً عبر إضافة `.gitlab-ci.yml`
+- **النشر المباشر من GitLab** بدون المرور بـ GitHub
+- **استضافة مشاريع إضافية** على نفس GitLab
+
+---
+
+## ✅ النتيجة المتوقعة
+
+بعد إكمال هذه الخطة:
+1. GitLab CE يعمل على `https://gitlab.slavacall-hiba.online` بـ HTTPS
+2. كل push على GitHub يُنسخ تلقائياً إلى GitLab خلال دقيقة
+3. لديك نسخة احتياطية كاملة للكود على بنيتك التحتية
+4. GitHub Actions يستمر بالنشر للإنتاج كما كان
+5. خيار التوسع لاستخدام GitLab CI/CD متوفر متى أردت
+
+**هل توافق على هذه الخطة للبدء بالتنفيذ؟** 🚀
