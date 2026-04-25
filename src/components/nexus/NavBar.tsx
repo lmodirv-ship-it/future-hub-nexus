@@ -1,27 +1,34 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Sparkles, LayoutDashboard, Briefcase, Mail, Wrench, LogIn, LogOut, Languages, Tag, Store, Menu } from "lucide-react";
+import { Sparkles, LayoutDashboard, Briefcase, Mail, Wrench, LogIn, LogOut, Languages, Tag, Store, Menu, Check } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin } from "@/hooks/use-is-admin";
-import { useI18n } from "@/lib/i18n";
+import { useI18n, SUPPORTED_LANGS, type Lang } from "@/lib/i18n";
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import hnLogo from "@/assets/hn-groupe-logo.png";
 
 export function NavBar() {
   const { user } = useAuth();
   const { isAdmin } = useIsAdmin();
-  const { lang, setLang, t } = useI18n();
-  const toggleLang = () => setLang(lang === "ar" ? "en" : "ar");
+  const { lang, setLang, t, langLabel } = useI18n();
   const [open, setOpen] = useState(false);
   const links = [
     { to: "/", label: t("nav.home"), icon: Sparkles },
     { to: "/projects", label: t("nav.projects"), icon: Briefcase },
-    { to: "/pricing", label: lang === "ar" ? "الأسعار" : "Pricing", icon: Tag },
-    { to: "/marketplace", label: lang === "ar" ? "السوق" : "Marketplace", icon: Store },
+    { to: "/pricing", label: t("nav.pricing"), icon: Tag },
+    { to: "/marketplace", label: t("nav.marketplace"), icon: Store },
     { to: "/services", label: t("nav.services"), icon: Wrench },
     { to: "/contact", label: t("nav.contact"), icon: Mail },
   ] as const;
+
+  const currentLabel = langLabel(lang);
 
   return (
     <header className="fixed top-4 left-1/2 z-50 w-[min(1100px,94vw)] -translate-x-1/2">
@@ -46,23 +53,44 @@ export function NavBar() {
           ))}
         </ul>
         <div className="flex items-center gap-2">
-          <button
-            onClick={toggleLang}
-            aria-label="تبديل اللغة"
-            title={lang === "ar" ? "English" : "العربية"}
-            className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 py-2 text-xs font-medium text-foreground transition-colors hover:bg-white/10"
-          >
-            <Languages className="h-4 w-4" />
-            <span className="font-display">{lang === "ar" ? "EN" : "AR"}</span>
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                aria-label={t("nav.menu")}
+                title={currentLabel.native}
+                className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 py-2 text-xs font-medium text-foreground transition-colors hover:bg-white/10"
+              >
+                <Languages className="h-4 w-4" />
+                <span className="font-display uppercase">{lang}</span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[160px] border-white/10 bg-background/95 backdrop-blur-xl">
+              {SUPPORTED_LANGS.map((l) => {
+                const lbl = langLabel(l);
+                return (
+                  <DropdownMenuItem
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className="flex items-center justify-between gap-2 cursor-pointer"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span aria-hidden>{lbl.flag}</span>
+                      <span>{lbl.native}</span>
+                    </span>
+                    {l === lang && <Check className="h-4 w-4 text-[oklch(0.85_0.18_200)]" />}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
           {isAdmin && (
             <Link
               to="/admin"
-              aria-label={lang === "ar" ? "لوحة التحكم" : "Admin"}
+              aria-label={t("nav.admin")}
               className="hidden items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-white/10 sm:flex"
             >
               <LayoutDashboard className="h-4 w-4" />
-              {lang === "ar" ? "الإدارة" : "Admin"}
+              {t("nav.admin")}
             </Link>
           )}
           {user ? (
@@ -83,16 +111,16 @@ export function NavBar() {
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <button
-                aria-label={lang === "ar" ? "فتح القائمة" : "Open menu"}
+                aria-label={t("nav.menu")}
                 className="flex items-center justify-center rounded-lg border border-white/10 bg-white/5 p-2 text-foreground transition-colors hover:bg-white/10 md:hidden"
               >
                 <Menu className="h-5 w-5" />
               </button>
             </SheetTrigger>
             <SheetContent side={lang === "ar" ? "right" : "left"} className="w-[85vw] max-w-sm border-white/10 bg-background/95 backdrop-blur-xl">
-              <SheetTitle className="font-display neon-text">{lang === "ar" ? "القائمة" : "Menu"}</SheetTitle>
+              <SheetTitle className="font-display neon-text">{t("nav.menu")}</SheetTitle>
               <SheetDescription className="sr-only">
-                {lang === "ar" ? "روابط التنقل في الموقع" : "Site navigation links"}
+                {t("nav.menu")}
               </SheetDescription>
               <ul className="mt-6 flex flex-col gap-1">
                 {links.map((l) => (
@@ -118,13 +146,24 @@ export function NavBar() {
                         className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
                       >
                         <LayoutDashboard className="h-4 w-4" />
-                        {lang === "ar" ? "لوحة التحكم" : "Admin"}
+                        {t("nav.admin")}
                       </Link>
                     </SheetClose>
                   </li>
                 )}
               </ul>
-              <div className="mt-6 border-t border-white/10 pt-4">
+              <div className="mt-6 border-t border-white/10 pt-4 space-y-3">
+                <div className="flex items-center justify-center gap-1 rounded-xl border border-white/10 bg-white/5 p-1">
+                  {SUPPORTED_LANGS.map((l: Lang) => (
+                    <button
+                      key={l}
+                      onClick={() => setLang(l)}
+                      className={`flex-1 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors ${l === lang ? "bg-white/10 text-foreground" : "text-muted-foreground"}`}
+                    >
+                      {langLabel(l).flag} {l.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
                 {user ? (
                   <SheetClose asChild>
                     <button
