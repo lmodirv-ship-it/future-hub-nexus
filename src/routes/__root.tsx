@@ -41,6 +41,8 @@ export const Route = createRootRoute({
       { property: "og:title", content: "HN-Dev — مركز التحكم لكل مشاريعك" },
       { property: "og:description", content: "منصة زجاجية من المستقبل تجمع كل مشاريعك الرقمية في فضاء واحد." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://www.slavacall-hiba.online/" },
+      { property: "og:site_name", content: "slavacall-hiba.online" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "HN-Dev — مركز التحكم لكل مشاريعك" },
       { name: "twitter:description", content: "منصة زجاجية من المستقبل تجمع كل مشاريعك الرقمية في فضاء واحد." },
@@ -48,6 +50,10 @@ export const Route = createRootRoute({
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/49391f56-cbde-4fc7-b51b-79b95eebc3ee/id-preview-8f8a00d5--6c0d65e5-805e-4e64-8a3b-4a6f2c47f81f.lovable.app-1776692597292.png" },
     ],
     links: [
+      {
+        rel: "canonical",
+        href: "https://www.slavacall-hiba.online/",
+      },
       {
         rel: "stylesheet",
         href: appCss,
