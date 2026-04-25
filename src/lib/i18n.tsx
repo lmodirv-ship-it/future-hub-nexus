@@ -31,7 +31,7 @@ const dict = {
     "footer.ecosystem": "المنظومة",
     "footer.follow": "تابعنا",
     "footer.followText": "صُمم بإتقان على Lovable — كل المشاريع في مكان واحد.",
-    "footer.rights": "جميع الحقوق محفوظة.",
+    "footer.rights": "HN Groupe — جميع الحقوق محفوظة — El Hassani Moulay Ismail",
     "footer.made": "صُنع بـ ✦ في عالم رقمي بلا حدود",
   },
   en: {
@@ -62,7 +62,7 @@ const dict = {
     "footer.ecosystem": "Ecosystem",
     "footer.follow": "Follow",
     "footer.followText": "Crafted on Lovable — all projects in one place.",
-    "footer.rights": "All rights reserved.",
+    "footer.rights": "HN Groupe — All rights reserved — El Hassani Moulay Ismail",
     "footer.made": "Made with ✦ in a borderless digital world",
   },
 } as const;
