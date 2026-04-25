@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { useI18n } from "@/lib/i18n";
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import hnLogo from "@/assets/hn-groupe-logo.png";
 
 export function NavBar() {
   const { user } = useAuth();
@@ -27,10 +28,7 @@ export function NavBar() {
     <header className="fixed top-4 left-1/2 z-50 w-[min(1100px,94vw)] -translate-x-1/2">
       <nav className="glass-strong flex items-center justify-between rounded-2xl px-4 py-2.5">
         <Link to="/" className="flex items-center gap-2">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[oklch(0.75_0.2_295)] to-[oklch(0.7_0.28_330)]">
-            <Sparkles className="h-5 w-5 text-background" />
-            <div className="absolute inset-0 rounded-xl blur-md opacity-60 bg-gradient-to-br from-[oklch(0.75_0.2_295)] to-[oklch(0.7_0.28_330)] -z-10" />
-          </div>
+          <img src={hnLogo} alt="HN-Groupe" className="h-9 w-9 rounded-xl object-cover" />
           <span className="font-display text-lg font-bold neon-text">HN-Dev</span>
         </Link>
         <ul className="hidden items-center gap-1 md:flex">
