@@ -1,35 +1,45 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sparkles, Layers, Globe, Zap } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
+import { buildPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
-    meta: [
-      { title: "عن المنصة — HN-Dev" },
-      { name: "description", content: "قصة منصة HN-Dev ورؤيتها لتوحيد كل المشاريع الرقمية في فضاء واحد." },
-      { property: "og:title", content: "عن HN-Dev" },
-      { property: "og:description", content: "رؤية مستقبلية لمركز تحكم رقمي موحد." },
-    ],
+    ...buildPageHead({
+      basePath: "/about",
+      lang: "ar",
+      title: {
+        ar: "عن المنصة — HN-Dev",
+        en: "About — HN-Dev",
+        fr: "À propos — HN-Dev",
+      },
+      description: {
+        ar: "قصة منصة HN-Dev ورؤيتها لتوحيد كل المشاريع الرقمية في فضاء واحد.",
+        en: "The story of HN-Dev and our vision to unify all digital projects in one space.",
+        fr: "L'histoire de HN-Dev et notre vision pour unifier tous les projets numériques.",
+      },
+    }),
   }),
   component: AboutPage,
 });
 
 function AboutPage() {
+  const { t } = useI18n();
   const values = [
-    { icon: Layers, title: "توحيد", text: "كل أعمالك في مكان واحد، بدون تشتت." },
-    { icon: Sparkles, title: "أناقة", text: "تصميم زجاجي مستقبلي يلهم الإبداع." },
-    { icon: Zap, title: "سرعة", text: "وصول فوري لأي مشروع أو خدمة." },
-    { icon: Globe, title: "شمولية", text: "تغطي AI، تجارة، عقارات، نقل، وأكثر." },
+    { icon: Layers, title: t("about.value.unify"), text: t("about.value.unify.text") },
+    { icon: Sparkles, title: t("about.value.elegance"), text: t("about.value.elegance.text") },
+    { icon: Zap, title: t("about.value.speed"), text: t("about.value.speed.text") },
+    { icon: Globe, title: t("about.value.global"), text: t("about.value.global.text") },
   ];
 
   return (
     <section className="relative mx-auto max-w-4xl px-6 pb-20 pt-32">
       <div className="text-center">
         <h1 className="font-display text-5xl font-bold sm:text-6xl">
-          نحن <span className="neon-text">HN-Dev</span>
+          {t("about.title.we")} <span className="neon-text">{t("about.title.brand")}</span>
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-          نؤمن بأن المستقبل الرقمي يجب أن يكون موحداً، أنيقاً، وفي متناول اليد.
-          HN-Dev هو الجسر الذي يربط بين كل أفكارك ومشاريعك في فضاء زجاجي واحد.
+          {t("about.lead")}
         </p>
       </div>
 
@@ -46,16 +56,13 @@ function AboutPage() {
       </div>
 
       <div className="glass mt-12 rounded-2xl p-8 text-center">
-        <h2 className="font-display text-2xl font-bold">رؤيتنا</h2>
-        <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-          أن نكون البوابة الموحدة لكل صانع رقمي — حيث يلتقي الإبداع بالتنظيم،
-          والجمال بالوظيفة، والحاضر بالمستقبل.
-        </p>
+        <h2 className="font-display text-2xl font-bold">{t("about.vision.title")}</h2>
+        <p className="mx-auto mt-3 max-w-xl text-muted-foreground">{t("about.vision.text")}</p>
         <Link
           to="/projects"
           className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[oklch(0.75_0.2_295)] to-[oklch(0.7_0.28_330)] px-6 py-3 font-medium text-background neon-glow transition-transform hover:scale-105"
         >
-          استكشف المشاريع
+          {t("about.cta.explore")}
         </Link>
       </div>
     </section>
