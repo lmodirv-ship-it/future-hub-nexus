@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 
-const SITE_URL = process.env.SITE_URL || "https://future-hub-nexus.lovable.app";
+const SITE_URL = process.env.SITE_URL || "https://www.slavacall-hiba.online";
 
 const STATIC_PATHS: Array<{ path: string; priority: number; changefreq: string }> = [
   { path: "/", priority: 1.0, changefreq: "weekly" },
