@@ -4,8 +4,7 @@ import appCss from "../styles.css?url";
 import { NavBar } from "@/components/nexus/NavBar";
 import { Footer } from "@/components/nexus/Footer";
 import { AuroraBackground } from "@/components/nexus/AuroraBackground";
-import { CookieConsent } from "@/components/nexus/CookieConsent";
-// touch: force module re-resolution
+import { CookieConsent } from "../components/nexus/CookieConsent";
 import { I18nProvider, getLangFromPath, useI18n } from "@/lib/i18n";
 import { CurrencyProvider } from "@/lib/currency";
 import { organizationSchema, websiteSchema } from "@/lib/seo";
