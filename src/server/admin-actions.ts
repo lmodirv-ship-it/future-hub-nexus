@@ -52,7 +52,7 @@ export const listUsers = createServerFn({ method: "POST" })
         id: u.id,
         email: u.email ?? "",
         created_at: u.created_at,
-        last_sign_in_at: u.last_sign_in_at,
+        last_sign_in_at: u.last_sign_in_at ?? null,
         roles: roleMap.get(u.id) ?? [],
       })),
     };
