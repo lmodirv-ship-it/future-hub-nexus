@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { HeroHN-Dev } from "@/components/nexus/HeroHN-Dev";
+import { HeroNexus } from "@/components/nexus/HeroNexus";
 import { ProjectGrid } from "@/components/nexus/ProjectGrid";
 import { ArrowLeft } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
@@ -20,7 +20,7 @@ function Index() {
   const { t } = useI18n();
   return (
     <>
-      <HeroHN-Dev />
+      <HeroNexus />
       <section className="relative mx-auto max-w-7xl px-6 py-20">
         <div className="mb-10 flex items-end justify-between">
           <div>
