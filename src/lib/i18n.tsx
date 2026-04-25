@@ -32,7 +32,7 @@ const dict = {
     "footer.follow": "تابعنا",
     "footer.followText": "HN-Groupe",
     "footer.rights": "HN Groupe — جميع الحقوق محفوظة — El Hassani Moulay Ismail",
-    "footer.made": "صُنع بـ ✦ في عالم رقمي بلا حدود",
+    "footer.made": "المصمم ✦ مولاي إسماعيل الحسني",
   },
   en: {
     "nav.home": "Home",
@@ -63,7 +63,7 @@ const dict = {
     "footer.follow": "Follow",
     "footer.followText": "HN-Groupe",
     "footer.rights": "HN Groupe — All rights reserved — El Hassani Moulay Ismail",
-    "footer.made": "Made with ✦ in a borderless digital world",
+    "footer.made": "Designer ✦ Moulay Ismail El Hassani",
   },
 } as const;
 
