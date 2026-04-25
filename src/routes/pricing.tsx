@@ -3,16 +3,25 @@ import { Check, Sparkles, Zap, Crown } from "lucide-react";
 import { usePlans } from "@/hooks/use-plans";
 import { useCurrency } from "@/lib/currency";
 import { useI18n } from "@/lib/i18n";
+import { buildPageHead } from "@/lib/seo";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
-    meta: [
-      { title: "الأسعار — HN-Dev | خطط مراقبة المواقع" },
-      { name: "description", content: "خطط اشتراك لمراقبة مواقعك 24/7. ابدأ مجاناً، ارتقِ عند الحاجة." },
-      { property: "og:title", content: "خطط HN-Dev — مراقبة المواقع" },
-      { property: "og:description", content: "Free, Pro, Business — اختر الخطة المناسبة لك." },
-    ],
+    ...buildPageHead({
+      basePath: "/pricing",
+      lang: "ar",
+      title: {
+        ar: "الأسعار — HN-Dev | خطط مراقبة المواقع",
+        en: "Pricing — HN-Dev | Website Monitoring Plans",
+        fr: "Tarifs — HN-Dev | Plans de surveillance",
+      },
+      description: {
+        ar: "خطط اشتراك لمراقبة مواقعك 24/7. ابدأ مجاناً، ارتقِ عند الحاجة.",
+        en: "Subscription plans for 24/7 website monitoring. Start free, upgrade when needed.",
+        fr: "Plans d'abonnement pour la surveillance 24/7. Commencez gratuitement.",
+      },
+    }),
   }),
   component: PricingPage,
 });
@@ -22,14 +31,14 @@ const ICONS = [Sparkles, Zap, Crown];
 function PricingPage() {
   const { plans, loading } = usePlans();
   const { currency, setCurrency, format } = useCurrency();
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
 
   const handleSubscribe = (slug: string) => {
     if (slug === "free") {
-      toast.success(lang === "ar" ? "الخطة المجانية مفعّلة لكل مستخدم جديد" : "Free plan is active for all new users");
+      toast.success(t("pricing.toast.free"));
       return;
     }
-    toast.info(lang === "ar" ? "بوابة الدفع قيد التفعيل — سنخبرك فور إطلاقها." : "Payment gateway being activated — we'll notify you on launch.");
+    toast.info(t("pricing.toast.gateway"));
   };
 
   return (
@@ -37,16 +46,13 @@ function PricingPage() {
       <div className="mb-12 text-center">
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs text-muted-foreground">
           <Sparkles className="h-3.5 w-3.5" />
-          {lang === "ar" ? "أسعار شفافة • بدون رسوم خفية" : "Transparent pricing • No hidden fees"}
+          {t("pricing.badge")}
         </div>
         <h1 className="font-display text-4xl font-bold sm:text-5xl">
-          {lang === "ar" ? "خطط تناسب " : "Plans for "}
-          <span className="neon-text">{lang === "ar" ? "كل مرحلة" : "every stage"}</span>
+          {t("pricing.title.plans")} <span className="neon-text">{t("pricing.title.stage")}</span>
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-          {lang === "ar"
-            ? "ابدأ مجاناً، وارتقِ عندما تنمو. اشتراك شهري قابل للإلغاء في أي وقت."
-            : "Start free, scale as you grow. Monthly billing, cancel anytime."}
+          {t("pricing.lead")}
         </p>
 
         <div className="mt-6 inline-flex rounded-xl border border-white/10 bg-white/5 p-1">
@@ -55,6 +61,12 @@ function PricingPage() {
             className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${currency === "USD" ? "bg-white/10 text-foreground" : "text-muted-foreground"}`}
           >
             USD $
+          </button>
+          <button
+            onClick={() => setCurrency("EUR")}
+            className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${currency === "EUR" ? "bg-white/10 text-foreground" : "text-muted-foreground"}`}
+          >
+            EUR €
           </button>
           <button
             onClick={() => setCurrency("MAD")}
@@ -85,7 +97,7 @@ function PricingPage() {
               >
                 {p.is_featured && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-[oklch(0.75_0.2_295)] to-[oklch(0.7_0.28_330)] px-3 py-1 text-xs font-semibold text-background">
-                    {lang === "ar" ? "الأكثر شعبية" : "Most popular"}
+                    {t("pricing.popular")}
                   </div>
                 )}
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[oklch(0.75_0.2_295)] to-[oklch(0.7_0.28_330)]">
@@ -97,7 +109,7 @@ function PricingPage() {
                   <span className="font-display text-4xl font-bold">
                     {format({ usd: p.price_usd_cents, mad: p.price_mad_cents })}
                   </span>
-                  <span className="text-sm text-muted-foreground">/{lang === "ar" ? "شهر" : "mo"}</span>
+                  <span className="text-sm text-muted-foreground">/{t("pricing.month")}</span>
                 </div>
                 <ul className="mt-6 flex-1 space-y-2">
                   {features.map((f, idx) => (
@@ -116,8 +128,8 @@ function PricingPage() {
                   }`}
                 >
                   {p.price_usd_cents === 0
-                    ? lang === "ar" ? "ابدأ مجاناً" : "Start Free"
-                    : lang === "ar" ? "اشترك الآن" : "Subscribe"}
+                    ? t("pricing.startFree")
+                    : t("pricing.subscribe")}
                 </button>
               </div>
             );
@@ -127,9 +139,9 @@ function PricingPage() {
 
       <div className="mt-16 text-center">
         <p className="text-sm text-muted-foreground">
-          {lang === "ar" ? "تحتاج خطة مخصصة لشركتك؟ " : "Need a custom plan for your company? "}
+          {t("pricing.custom.text")}
           <Link to="/contact" className="text-foreground underline-offset-4 hover:underline">
-            {lang === "ar" ? "تواصل معنا" : "Contact us"}
+            {t("pricing.custom.contact")}
           </Link>
         </p>
       </div>
