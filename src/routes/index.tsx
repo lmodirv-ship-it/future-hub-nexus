@@ -3,15 +3,24 @@ import { HeroNexus } from "@/components/nexus/HeroNexus";
 import { ProjectGrid } from "@/components/nexus/ProjectGrid";
 import { ArrowLeft } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { buildPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: [
-      { title: "HN-Dev — مركز التحكم لكل مشاريعك" },
-      { name: "description", content: "منصة زجاجية من المستقبل تجمع 14 مشروعاً رقمياً في فضاء واحد." },
-      { property: "og:title", content: "HN-Dev — كل مشاريعك في مكان واحد" },
-      { property: "og:description", content: "AI، تجارة، عقارات، نقل، خدمات — كل شيء في منصة واحدة." },
-    ],
+    ...buildPageHead({
+      basePath: "/",
+      lang: "ar",
+      title: {
+        ar: "HN-Dev — مركز التحكم لكل مشاريعك",
+        en: "HN-Dev — Control hub for all your digital projects",
+        fr: "HN-Dev — Centre de contrôle pour tous vos projets numériques",
+      },
+      description: {
+        ar: "منصة زجاجية من المستقبل تجمع 14 مشروعاً رقمياً في فضاء واحد. AI، تجارة، عقارات، نقل، خدمات.",
+        en: "A futuristic glass platform that unites 14 digital projects in one space. AI, commerce, real estate, transport, services.",
+        fr: "Une plateforme en verre futuriste qui réunit 14 projets numériques. IA, commerce, immobilier, transport, services.",
+      },
+    }),
   }),
   component: Index,
 });

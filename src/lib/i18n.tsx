@@ -1,107 +1,129 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { ar } from "./i18n-locales/ar";
+import { en } from "./i18n-locales/en";
+import { fr } from "./i18n-locales/fr";
+import type { Dict, Key } from "./i18n-locales/keys";
 
-export type Lang = "ar" | "en";
+export type Lang = "ar" | "en" | "fr";
 
-const dict = {
-  ar: {
-    "nav.home": "الرئيسية",
-    "nav.projects": "المشاريع",
-    "nav.services": "الخدمات",
-    "nav.admin": "لوحة التحكم",
-    "nav.about": "عن المنصة",
-    "nav.contact": "تواصل",
-    "nav.login": "دخول المدير",
-    "nav.logout": "خروج",
-    "hero.badge": "{n} مشروع نشط الآن",
-    "hero.title1": "HN-Dev",
-    "hero.title2": "من المستقبل",
-    "hero.desc": "مركز تحكم زجاجي يجمع كل مشاريعك الرقمية في فضاء واحد. منصة، خدمات، ذكاء اصطناعي، تجارة، عقارات، نقل — كل شيء في مكان واحد.",
-    "hero.explore": "استكشف المشاريع",
-    "hero.admin": "لوحة التحكم",
-    "stats.projects": "مشروع",
-    "stats.categories": "فئة",
-    "stats.services": "خدمة",
-    "stats.possibilities": "إمكانية",
-    "home.activeTitle": "النشطة",
-    "home.activePrefix": "المشاريع",
-    "home.activeDesc": "كل أعمالك في مكان واحد، بشكل زجاجي مستقبلي.",
-    "home.viewAll": "عرض الكل",
-    "footer.tagline": "مركز تحكم موحد لكل مشاريعك الرقمية في فضاء واحد من المستقبل.",
-    "footer.platform": "المنصة",
-    "footer.ecosystem": "المنظومة",
-    "footer.follow": "تابعنا",
-    "footer.followText": "HN-Groupe",
-    "footer.rights": "HN Groupe — جميع الحقوق محفوظة — El Hassani Moulay Ismail",
-    "footer.made": "المصمم ✦ مولاي إسماعيل الحسني",
-  },
-  en: {
-    "nav.home": "Home",
-    "nav.projects": "Projects",
-    "nav.services": "Services",
-    "nav.admin": "Dashboard",
-    "nav.about": "About",
-    "nav.contact": "Contact",
-    "nav.login": "Admin Login",
-    "nav.logout": "Logout",
-    "hero.badge": "{n} active projects now",
-    "hero.title1": "HN-DEV",
-    "hero.title2": "from the future",
-    "hero.desc": "A glass control center that unites all your digital projects in one space. Platform, services, AI, commerce, real estate, transport — everything in one place.",
-    "hero.explore": "Explore Projects",
-    "hero.admin": "Dashboard",
-    "stats.projects": "Projects",
-    "stats.categories": "Categories",
-    "stats.services": "Services",
-    "stats.possibilities": "Possibilities",
-    "home.activeTitle": "Projects",
-    "home.activePrefix": "Active",
-    "home.activeDesc": "All your work in one place, in futuristic glass style.",
-    "home.viewAll": "View All",
-    "footer.tagline": "A unified control hub for all your digital projects in one futuristic space.",
-    "footer.platform": "Platform",
-    "footer.ecosystem": "Ecosystem",
-    "footer.follow": "Follow",
-    "footer.followText": "HN-Groupe",
-    "footer.rights": "HN Groupe — All rights reserved — El Hassani Moulay Ismail",
-    "footer.made": "Designer ✦ Moulay Ismail El Hassani",
-  },
-} as const;
+export const SUPPORTED_LANGS: Lang[] = ["ar", "en", "fr"];
+export const DEFAULT_LANG: Lang = "ar";
 
-type Key = keyof typeof dict["ar"];
+const dicts: Record<Lang, Dict> = { ar, en, fr };
 
-const Ctx = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: (k: Key, vars?: Record<string, string | number>) => string }>({
-  lang: "ar",
+const LANG_LABELS: Record<Lang, { native: string; flag: string }> = {
+  ar: { native: "العربية", flag: "🇲🇦" },
+  en: { native: "English", flag: "🇬🇧" },
+  fr: { native: "Français", flag: "🇫🇷" },
+};
+
+export function getLangFromPath(pathname: string): Lang {
+  const seg = pathname.split("/")[1];
+  if (seg === "en" || seg === "fr") return seg;
+  return DEFAULT_LANG;
+}
+
+export function stripLangFromPath(pathname: string): string {
+  const seg = pathname.split("/")[1];
+  if (seg === "en" || seg === "fr" || seg === "ar") {
+    const rest = pathname.slice(seg.length + 1);
+    return rest === "" ? "/" : rest;
+  }
+  return pathname || "/";
+}
+
+export function buildLangPath(lang: Lang, basePath: string): string {
+  const clean = basePath.startsWith("/") ? basePath : `/${basePath}`;
+  if (lang === DEFAULT_LANG) return clean;
+  return `/${lang}${clean === "/" ? "" : clean}`;
+}
+
+function setCookie(name: string, value: string, days = 365) {
+  if (typeof document === "undefined") return;
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${value}; expires=${expires}; path=/; samesite=lax`;
+}
+
+function getCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+function detectBrowserLang(): Lang {
+  if (typeof navigator === "undefined") return DEFAULT_LANG;
+  const langs = navigator.languages?.length ? navigator.languages : [navigator.language];
+  for (const l of langs) {
+    const code = l.toLowerCase().slice(0, 2);
+    if (code === "en" || code === "fr" || code === "ar") return code as Lang;
+  }
+  return DEFAULT_LANG;
+}
+
+const Ctx = createContext<{
+  lang: Lang;
+  setLang: (l: Lang) => void;
+  t: (k: Key, vars?: Record<string, string | number>) => string;
+  langLabel: (l: Lang) => { native: string; flag: string };
+}>({
+  lang: DEFAULT_LANG,
   setLang: () => {},
   t: (k) => k,
+  langLabel: (l) => LANG_LABELS[l],
 });
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("ar");
+  const [lang, setLangState] = useState<Lang>(DEFAULT_LANG);
 
   useEffect(() => {
-    const saved = (typeof window !== "undefined" && localStorage.getItem("lang")) as Lang | null;
-    const initial: Lang = saved === "en" || saved === "ar" ? saved : "ar";
+    if (typeof window === "undefined") return;
+    // Priority: URL > cookie > localStorage > browser > default
+    const fromUrl = getLangFromPath(window.location.pathname);
+    const urlSeg = window.location.pathname.split("/")[1];
+    const explicit = urlSeg === "en" || urlSeg === "fr" || urlSeg === "ar";
+
+    let initial: Lang = DEFAULT_LANG;
+    if (explicit) {
+      initial = fromUrl;
+    } else {
+      const cookie = getCookie("lang") as Lang | null;
+      const ls = localStorage.getItem("lang") as Lang | null;
+      if (cookie && SUPPORTED_LANGS.includes(cookie)) initial = cookie;
+      else if (ls && SUPPORTED_LANGS.includes(ls)) initial = ls;
+      else initial = detectBrowserLang();
+    }
+
     setLangState(initial);
     document.documentElement.lang = initial;
     document.documentElement.dir = initial === "ar" ? "rtl" : "ltr";
+    setCookie("lang", initial);
+    localStorage.setItem("lang", initial);
   }, []);
 
-  const setLang = (l: Lang) => {
+  const setLang = useCallback((l: Lang) => {
     setLangState(l);
     if (typeof window !== "undefined") {
       localStorage.setItem("lang", l);
+      setCookie("lang", l);
       document.documentElement.lang = l;
       document.documentElement.dir = l === "ar" ? "rtl" : "ltr";
     }
-  };
+  }, []);
 
-  const t = (k: Key, vars?: Record<string, string | number>) => {
-    let s: string = (dict[lang] as Record<string, string>)[k] ?? (dict.ar as Record<string, string>)[k] ?? k;
-    if (vars) for (const [vk, vv] of Object.entries(vars)) s = s.replace(`{${vk}}`, String(vv));
-    return s;
-  };
+  const t = useCallback(
+    (k: Key, vars?: Record<string, string | number>) => {
+      let s: string = (dicts[lang] as Record<string, string>)[k] ?? (dicts[DEFAULT_LANG] as Record<string, string>)[k] ?? k;
+      if (vars) for (const [vk, vv] of Object.entries(vars)) s = s.replace(`{${vk}}`, String(vv));
+      return s;
+    },
+    [lang],
+  );
 
-  return <Ctx.Provider value={{ lang, setLang, t }}>{children}</Ctx.Provider>;
+  const langLabel = useCallback((l: Lang) => LANG_LABELS[l], []);
+
+  const value = useMemo(() => ({ lang, setLang, t, langLabel }), [lang, setLang, t, langLabel]);
+
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
 export const useI18n = () => useContext(Ctx);
