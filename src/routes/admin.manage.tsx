@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   Users, Shield, ShieldOff, Trash2, Bell, BellOff, CheckCheck, Mail,
   Briefcase, CreditCard, Package, RefreshCw, AlertCircle, Crown,
+  ChevronRight, ChevronLeft,
 } from "lucide-react";
 import { AdminGuard } from "@/components/nexus/AdminGuard";
 import { AdminLayout } from "@/components/admin/AdminLayout";
@@ -95,6 +96,9 @@ function UsersPanel({ onMessage }: { onMessage: (m: string) => void }) {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [perPage] = useState(20);
+  const [total, setTotal] = useState(0);
   const listFn = useServerFn(listUsers);
   const setRoleFn = useServerFn(setUserRole);
   const delFn = useServerFn(deleteUser);
@@ -102,14 +106,15 @@ function UsersPanel({ onMessage }: { onMessage: (m: string) => void }) {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const r = await listFn();
+      const r = await listFn({ data: { page, perPage } });
       setUsers(r.users);
+      setTotal(r.total);
     } catch (e) {
       onMessage(`خطأ: ${e instanceof Error ? e.message : "فشل التحميل"}`);
     } finally {
       setLoading(false);
     }
-  }, [listFn, onMessage]);
+  }, [listFn, onMessage, page, perPage]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -147,7 +152,7 @@ function UsersPanel({ onMessage }: { onMessage: (m: string) => void }) {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-display text-base font-bold flex items-center gap-2">
           <Users className="h-4 w-4 text-[oklch(0.85_0.18_200)]" />
-          المستخدمون ({users.length})
+          المستخدمون ({total})
         </h2>
         <div className="flex gap-2">
           <input
@@ -237,6 +242,7 @@ function UsersPanel({ onMessage }: { onMessage: (m: string) => void }) {
           </tbody>
         </table>
       </div>
+      <Pagination page={page} perPage={perPage} total={total} onChange={setPage} />
     </div>
   );
 }
@@ -253,16 +259,23 @@ const STATUSES = ["new", "contacted", "in_progress", "won", "lost"];
 function RequestsPanel({ onMessage }: { onMessage: (m: string) => void }) {
   const [rows, setRows] = useState<ReqRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [perPage] = useState(10);
+  const [total, setTotal] = useState(0);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const from = (page - 1) * perPage;
+    const to = from + perPage - 1;
+    const { data, error, count } = await supabase
       .from("service_requests")
-      .select("*")
-      .order("created_at", { ascending: false });
+      .select("*", { count: "exact" })
+      .order("created_at", { ascending: false })
+      .range(from, to);
     if (!error && data) setRows(data as ReqRow[]);
+    setTotal(count ?? 0);
     setLoading(false);
-  }, []);
+  }, [page, perPage]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -284,7 +297,7 @@ function RequestsPanel({ onMessage }: { onMessage: (m: string) => void }) {
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-display text-base font-bold flex items-center gap-2">
           <Briefcase className="h-4 w-4 text-[oklch(0.85_0.18_200)]" />
-          طلبات الخدمة ({rows.length})
+          طلبات الخدمة ({total})
         </h2>
         <button onClick={load} className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10">
           <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> تحديث
@@ -320,6 +333,7 @@ function RequestsPanel({ onMessage }: { onMessage: (m: string) => void }) {
           <div className="py-8 text-center text-sm text-muted-foreground">لا توجد طلبات.</div>
         )}
       </div>
+      <Pagination page={page} perPage={perPage} total={total} onChange={setPage} />
     </div>
   );
 }
@@ -334,16 +348,26 @@ type SubRow = {
 function SubscriptionsPanel() {
   const [rows, setRows] = useState<SubRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [perPage] = useState(20);
+  const [total, setTotal] = useState(0);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase
+    const from = (page - 1) * perPage;
+    const to = from + perPage - 1;
+    const { data, count } = await supabase
       .from("subscriptions")
-      .select("id, user_id, status, created_at, current_period_end, cancel_at_period_end, plans(name_ar, slug)")
-      .order("created_at", { ascending: false });
+      .select(
+        "id, user_id, status, created_at, current_period_end, cancel_at_period_end, plans(name_ar, slug)",
+        { count: "exact" },
+      )
+      .order("created_at", { ascending: false })
+      .range(from, to);
     if (data) setRows(data as unknown as SubRow[]);
+    setTotal(count ?? 0);
     setLoading(false);
-  }, []);
+  }, [page, perPage]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -352,7 +376,7 @@ function SubscriptionsPanel() {
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-display text-base font-bold flex items-center gap-2">
           <CreditCard className="h-4 w-4 text-[oklch(0.85_0.18_200)]" />
-          الاشتراكات ({rows.length})
+          الاشتراكات ({total})
         </h2>
         <button onClick={load} className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10">
           <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> تحديث
@@ -390,6 +414,49 @@ function SubscriptionsPanel() {
             )}
           </tbody>
         </table>
+      </div>
+      <Pagination page={page} perPage={perPage} total={total} onChange={setPage} />
+    </div>
+  );
+}
+
+/* =================== Pagination control =================== */
+function Pagination({
+  page,
+  perPage,
+  total,
+  onChange,
+}: {
+  page: number;
+  perPage: number;
+  total: number;
+  onChange: (p: number) => void;
+}) {
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
+  if (total <= perPage) return null;
+  const from = (page - 1) * perPage + 1;
+  const to = Math.min(page * perPage, total);
+  return (
+    <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-3 text-xs text-muted-foreground">
+      <div>عرض {from}–{to} من {total}</div>
+      <div className="flex items-center gap-1.5">
+        <button
+          onClick={() => onChange(Math.max(1, page - 1))}
+          disabled={page <= 1}
+          className="rounded border border-white/10 bg-white/5 p-1.5 hover:bg-white/10 disabled:opacity-30"
+          aria-label="السابق"
+        >
+          <ChevronRight className="h-3.5 w-3.5" />
+        </button>
+        <span className="px-2 font-mono">{page} / {totalPages}</span>
+        <button
+          onClick={() => onChange(Math.min(totalPages, page + 1))}
+          disabled={page >= totalPages}
+          className="rounded border border-white/10 bg-white/5 p-1.5 hover:bg-white/10 disabled:opacity-30"
+          aria-label="التالي"
+        >
+          <ChevronLeft className="h-3.5 w-3.5" />
+        </button>
       </div>
     </div>
   );
