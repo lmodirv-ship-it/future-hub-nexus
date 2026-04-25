@@ -25,16 +25,25 @@ async function ensureAdmin(supabase: ReturnType<typeof getAdminClient>, userId: 
 }
 
 /* ============================ List users ============================ */
+const listUsersSchema = z.object({
+  page: z.number().int().min(1).default(1),
+  perPage: z.number().int().min(1).max(100).default(20),
+});
+
 export const listUsers = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((input: unknown) => listUsersSchema.parse(input ?? {}))
+  .handler(async ({ data, context }) => {
     const admin = getAdminClient();
     await ensureAdmin(admin, context.userId);
 
-    const { data, error } = await admin.auth.admin.listUsers({ page: 1, perPage: 200 });
+    const { data: page, error } = await admin.auth.admin.listUsers({
+      page: data.page,
+      perPage: data.perPage,
+    });
     if (error) throw new Error(error.message);
 
-    const ids = data.users.map((u) => u.id);
+    const ids = page.users.map((u) => u.id);
     const { data: roles } = await admin
       .from("user_roles")
       .select("user_id, role")
@@ -47,8 +56,14 @@ export const listUsers = createServerFn({ method: "POST" })
       roleMap.set(r.user_id, arr);
     });
 
+    const total =
+      (page as unknown as { total?: number }).total ?? page.users.length;
+
     return {
-      users: data.users.map((u) => ({
+      page: data.page,
+      perPage: data.perPage,
+      total,
+      users: page.users.map((u) => ({
         id: u.id,
         email: u.email ?? "",
         created_at: u.created_at,
