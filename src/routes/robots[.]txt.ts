@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-const SITE_URL = process.env.SITE_URL || "https://future-hub-nexus.lovable.app";
+const SITE_URL = process.env.SITE_URL || "https://www.slavacall-hiba.online";
 
 export const Route = createFileRoute("/robots.txt")({
   server: {
