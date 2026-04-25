@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { useLocation } from "@tanstack/react-router";
+import { useLocation, Link } from "@tanstack/react-router";
 import {
   LayoutDashboard, FolderKanban, Activity, Eye, Bell, Settings,
   Menu, X, ExternalLink, LogOut, Home, Radar,
@@ -70,9 +70,9 @@ export function AdminLayout({ children, title, subtitle, actions }: { children: 
               {NAV.map((item) => {
                 const active = isActive(item.to, item.exact);
                 return (
-                  <a
+                  <Link
                     key={item.to}
-                    href={item.to}
+                    to={item.to}
                     onClick={() => setOpen(false)}
                     className={`flex items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors ${
                       active
@@ -89,15 +89,15 @@ export function AdminLayout({ children, title, subtitle, actions }: { children: 
                         {downCount}
                       </span>
                     )}
-                  </a>
+                  </Link>
                 );
               })}
             </nav>
 
             <div className="mt-6 space-y-1 border-t border-white/5 pt-4">
-              <a href="/" className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground">
+              <Link to="/" className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground">
                 <Home className="h-4 w-4" /> الموقع
-              </a>
+              </Link>
               <a href="https://lovable.dev" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground">
                 <ExternalLink className="h-4 w-4" /> Lovable
               </a>
