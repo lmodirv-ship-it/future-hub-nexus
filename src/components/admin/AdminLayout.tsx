@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { useLocation, Link } from "@tanstack/react-router";
 import {
   LayoutDashboard, FolderKanban, Activity, Eye, Bell, Settings,
-  Menu, X, ExternalLink, LogOut, Home, Radar, Crown,
+  Menu, X, ExternalLink, LogOut, Home, Radar, Crown, Search,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -17,6 +17,7 @@ const NAV: NavItem[] = [
   { to: "/admin/checks", label: "الفحوصات", icon: Activity },
   { to: "/admin/visits", label: "الزيارات", icon: Eye },
   { to: "/admin/alerts", label: "التنبيهات", icon: Bell },
+  { to: "/admin/seo", label: "تحقق SEO", icon: Search },
   { to: "/admin/settings", label: "الإعدادات", icon: Settings },
 ];
 

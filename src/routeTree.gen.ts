@@ -30,6 +30,7 @@ import { Route as ProjectsSlugRouteImport } from './routes/projects.$slug'
 import { Route as MarketplaceSlugRouteImport } from './routes/marketplace.$slug'
 import { Route as AdminVisitsRouteImport } from './routes/admin.visits'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminProjectsRouteImport } from './routes/admin.projects'
 import { Route as AdminManageRouteImport } from './routes/admin.manage'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
@@ -145,6 +146,11 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSeoRoute = AdminSeoRouteImport.update({
+  id: '/seo',
+  path: '/seo',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminProjectsRoute = AdminProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/projects': typeof AdminProjectsRoute
+  '/admin/seo': typeof AdminSeoRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
@@ -250,6 +257,7 @@ export interface FileRoutesByTo {
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/projects': typeof AdminProjectsRoute
+  '/admin/seo': typeof AdminSeoRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
@@ -283,6 +291,7 @@ export interface FileRoutesById {
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/projects': typeof AdminProjectsRoute
+  '/admin/seo': typeof AdminSeoRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/visits': typeof AdminVisitsRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
@@ -317,6 +326,7 @@ export interface FileRouteTypes {
     | '/admin/leads'
     | '/admin/manage'
     | '/admin/projects'
+    | '/admin/seo'
     | '/admin/settings'
     | '/admin/visits'
     | '/marketplace/$slug'
@@ -349,6 +359,7 @@ export interface FileRouteTypes {
     | '/admin/leads'
     | '/admin/manage'
     | '/admin/projects'
+    | '/admin/seo'
     | '/admin/settings'
     | '/admin/visits'
     | '/marketplace/$slug'
@@ -381,6 +392,7 @@ export interface FileRouteTypes {
     | '/admin/leads'
     | '/admin/manage'
     | '/admin/projects'
+    | '/admin/seo'
     | '/admin/settings'
     | '/admin/visits'
     | '/marketplace/$slug'
@@ -562,6 +574,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/seo': {
+      id: '/admin/seo'
+      path: '/seo'
+      fullPath: '/admin/seo'
+      preLoaderRoute: typeof AdminSeoRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/projects': {
       id: '/admin/projects'
       path: '/projects'
@@ -635,6 +654,7 @@ interface AdminRouteChildren {
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminManageRoute: typeof AdminManageRoute
   AdminProjectsRoute: typeof AdminProjectsRoute
+  AdminSeoRoute: typeof AdminSeoRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminVisitsRoute: typeof AdminVisitsRoute
 }
@@ -646,6 +666,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLeadsRoute: AdminLeadsRoute,
   AdminManageRoute: AdminManageRoute,
   AdminProjectsRoute: AdminProjectsRoute,
+  AdminSeoRoute: AdminSeoRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminVisitsRoute: AdminVisitsRoute,
 }
