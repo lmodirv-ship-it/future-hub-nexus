@@ -8,7 +8,7 @@ import { useAlerts, type AlertRow } from "@/hooks/use-alerts";
 import { checkAllProjects } from "@/server/check-projects";
 
 export const Route = createFileRoute("/admin/alerts")({
-  head: () => ({ meta: [{ title: "التنبيهات — نكسس" }] }),
+  head: () => ({ meta: [{ title: "التنبيهات — HN-Dev" }] }),
   component: () => (<AdminGuard><Page /></AdminGuard>),
 });
 

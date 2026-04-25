@@ -7,9 +7,9 @@ import { useI18n } from "@/lib/i18n";
 export const Route = createFileRoute("/marketplace")({
   head: () => ({
     meta: [
-      { title: "السوق — قوالب جاهزة | نكسس" },
+      { title: "السوق — قوالب جاهزة | HN-Dev" },
       { name: "description", content: "قوالب احترافية جاهزة للنشر — كود مصدر كامل، تصميم متجاوب، تحديثات مجانية." },
-      { property: "og:title", content: "سوق نكسس — قوالب جاهزة" },
+      { property: "og:title", content: "سوق HN-Dev — قوالب جاهزة" },
       { property: "og:description", content: "اشترِ نسختك من أي مشروع وابدأ فوراً." },
     ],
   }),

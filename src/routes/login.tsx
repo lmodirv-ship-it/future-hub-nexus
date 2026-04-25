@@ -9,7 +9,7 @@ import { Sparkles, LogIn, ShieldCheck } from "lucide-react";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "دخول المدير — نكسس" },
+      { title: "دخول المدير — HN-Dev" },
       { name: "description", content: "تسجيل دخول المدير عبر Google." },
     ],
   }),
@@ -74,7 +74,7 @@ function LoginPage() {
         )}
 
         <p className="mt-6 flex items-center justify-center gap-1 text-[11px] text-muted-foreground">
-          <Sparkles className="h-3 w-3" /> محمي بمنظومة نكسس الزجاجية
+          <Sparkles className="h-3 w-3" /> محمي بمنظومة HN-Dev الزجاجية
         </p>
       </div>
     </section>

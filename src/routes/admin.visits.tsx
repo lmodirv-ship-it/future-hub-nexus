@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProjects } from "@/hooks/use-projects";
 
 export const Route = createFileRoute("/admin/visits")({
-  head: () => ({ meta: [{ title: "الزيارات — نكسس" }] }),
+  head: () => ({ meta: [{ title: "الزيارات — HN-Dev" }] }),
   component: () => (<AdminGuard><Page /></AdminGuard>),
 });
 

@@ -8,9 +8,9 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "الأسعار — نكسس | خطط مراقبة المواقع" },
+      { title: "الأسعار — HN-Dev | خطط مراقبة المواقع" },
       { name: "description", content: "خطط اشتراك لمراقبة مواقعك 24/7. ابدأ مجاناً، ارتقِ عند الحاجة." },
-      { property: "og:title", content: "خطط نكسس — مراقبة المواقع" },
+      { property: "og:title", content: "خطط HN-Dev — مراقبة المواقع" },
       { property: "og:description", content: "Free, Pro, Business — اختر الخطة المناسبة لك." },
     ],
   }),

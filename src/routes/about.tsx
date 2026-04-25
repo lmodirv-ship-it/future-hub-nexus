@@ -4,9 +4,9 @@ import { Sparkles, Layers, Globe, Zap } from "lucide-react";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "عن المنصة — نكسس" },
-      { name: "description", content: "قصة منصة نكسس ورؤيتها لتوحيد كل المشاريع الرقمية في فضاء واحد." },
-      { property: "og:title", content: "عن نكسس" },
+      { title: "عن المنصة — HN-Dev" },
+      { name: "description", content: "قصة منصة HN-Dev ورؤيتها لتوحيد كل المشاريع الرقمية في فضاء واحد." },
+      { property: "og:title", content: "عن HN-Dev" },
       { property: "og:description", content: "رؤية مستقبلية لمركز تحكم رقمي موحد." },
     ],
   }),
@@ -25,11 +25,11 @@ function AboutPage() {
     <section className="relative mx-auto max-w-4xl px-6 pb-20 pt-32">
       <div className="text-center">
         <h1 className="font-display text-5xl font-bold sm:text-6xl">
-          نحن <span className="neon-text">نكسس</span>
+          نحن <span className="neon-text">HN-Dev</span>
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
           نؤمن بأن المستقبل الرقمي يجب أن يكون موحداً، أنيقاً، وفي متناول اليد.
-          نكسس هو الجسر الذي يربط بين كل أفكارك ومشاريعك في فضاء زجاجي واحد.
+          HN-Dev هو الجسر الذي يربط بين كل أفكارك ومشاريعك في فضاء زجاجي واحد.
         </p>
       </div>
 

@@ -5,9 +5,9 @@ import { AdminGuard } from "@/components/nexus/AdminGuard";
 export const Route = createFileRoute("/projects")({
   head: () => ({
     meta: [
-      { title: "المشاريع — نكسس" },
+      { title: "المشاريع — HN-Dev" },
       { name: "description", content: "تصفح كل المشاريع الـ 14 مع فلترة بالفئة وبحث فوري." },
-      { property: "og:title", content: "المشاريع — نكسس" },
+      { property: "og:title", content: "المشاريع — HN-Dev" },
       { property: "og:description", content: "14 مشروعاً رقمياً في فضاء زجاجي واحد." },
     ],
   }),

@@ -19,7 +19,7 @@ export const Route = createFileRoute("/marketplace/$slug")({
   },
   head: ({ loaderData, params }) => {
     const t = loaderData?.template;
-    const title = t ? `${t.title_ar ?? t.title_en} — قالب نكسس` : `${params.slug} — قالب نكسس`;
+    const title = t ? `${t.title_ar ?? t.title_en} — قالب HN-Dev` : `${params.slug} — قالب HN-Dev`;
     const desc = (t?.description_ar ?? t?.description_en ?? "قالب احترافي جاهز للنشر").toString().slice(0, 160);
     const meta: Array<Record<string, string>> = [
       { title },

@@ -5,9 +5,9 @@ import { useI18n } from "@/lib/i18n";
 export const Route = createFileRoute("/monitor")({
   head: () => ({
     meta: [
-      { title: "مراقبة المواقع 24/7 — نكسس" },
+      { title: "مراقبة المواقع 24/7 — HN-Dev" },
       { name: "description", content: "راقب موقعك على مدار الساعة. تنبيهات فورية عند أي تعطل. ابدأ مجاناً." },
-      { property: "og:title", content: "مراقبة المواقع — نكسس" },
+      { property: "og:title", content: "مراقبة المواقع — HN-Dev" },
       { property: "og:description", content: "راقب موقعك 24/7 مع تنبيهات فورية." },
     ],
   }),
@@ -37,7 +37,7 @@ function MonitorPage() {
       <section className="relative mx-auto max-w-5xl px-6 pb-20 pt-32 text-center">
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs text-muted-foreground">
           <Sparkles className="h-3.5 w-3.5" />
-          {lang === "ar" ? "خدمة جديدة من نكسس" : "New from Nexus"}
+          {lang === "ar" ? "خدمة جديدة من HN-Dev" : "New from HN-Dev"}
         </div>
         <h1 className="font-display text-5xl font-bold leading-tight sm:text-6xl">
           {lang === "ar" ? "موقعك " : "Your site, "}

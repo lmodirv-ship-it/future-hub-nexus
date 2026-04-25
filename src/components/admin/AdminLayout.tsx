@@ -107,7 +107,7 @@ export function AdminLayout({ children, title, subtitle, actions }: { children: 
             </div>
 
             <div className="mt-6 rounded-xl border border-white/5 bg-white/[0.02] p-3 text-[11px] text-muted-foreground/80">
-              <div className="font-semibold text-foreground">نكسس v1.0</div>
+              <div className="font-semibold text-foreground">HN-Dev v1.0</div>
               <div className="mt-1">قابل للتوسع لإدارة آلاف المشاريع.</div>
             </div>
           </div>

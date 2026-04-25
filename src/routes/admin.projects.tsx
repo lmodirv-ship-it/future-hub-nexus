@@ -10,7 +10,7 @@ import { getIcon, GLOW_MAP, type GlowKey } from "@/lib/icon-map";
 import { Pencil, Trash2, Plus, RefreshCw, ExternalLink, Activity, X, Save, Search } from "lucide-react";
 
 export const Route = createFileRoute("/admin/projects")({
-  head: () => ({ meta: [{ title: "إدارة المشاريع — نكسس" }] }),
+  head: () => ({ meta: [{ title: "إدارة المشاريع — HN-Dev" }] }),
   component: () => (<AdminGuard><AdminProjectsPage /></AdminGuard>),
 });
 

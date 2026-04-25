@@ -3,10 +3,10 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "سياسة الخصوصية — نكسس" },
-      { name: "description", content: "كيف تجمع نكسس بياناتك وتستخدمها وتحميها." },
-      { property: "og:title", content: "سياسة الخصوصية — نكسس" },
-      { property: "og:description", content: "كيف تجمع نكسس بياناتك وتستخدمها وتحميها." },
+      { title: "سياسة الخصوصية — HN-Dev" },
+      { name: "description", content: "كيف تجمع HN-Dev بياناتك وتستخدمها وتحميها." },
+      { property: "og:title", content: "سياسة الخصوصية — HN-Dev" },
+      { property: "og:description", content: "كيف تجمع HN-Dev بياناتك وتستخدمها وتحميها." },
     ],
   }),
   component: PrivacyPage,
@@ -25,7 +25,7 @@ function PrivacyPage() {
           <section>
             <h2 className="font-display text-xl font-semibold mb-3">1. مقدمة</h2>
             <p>
-              تحترم نكسس خصوصيتك. توضّح هذه السياسة أنواع البيانات التي نجمعها عند
+              تحترم HN-Dev خصوصيتك. توضّح هذه السياسة أنواع البيانات التي نجمعها عند
               استخدامك للمنصة، وكيفية استخدامها وحمايتها ومشاركتها.
             </p>
           </section>

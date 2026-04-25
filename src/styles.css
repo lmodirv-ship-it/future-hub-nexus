@@ -4,7 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Glass Nexus — Futuristic glass design system */
+/* Glass HN-Dev — Futuristic glass design system */
 
 /*
  * Design system definition.
@@ -183,7 +183,7 @@
   50% { opacity: 1; }
 }
 
-/* ===== Glass Nexus utilities ===== */
+/* ===== Glass HN-Dev utilities ===== */
 @layer utilities {
   .glass {
     background: var(--glass-bg);

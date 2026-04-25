@@ -3,10 +3,10 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "الشروط والأحكام — نكسس" },
-      { name: "description", content: "الشروط والأحكام لاستخدام منصة نكسس وخدماتها." },
-      { property: "og:title", content: "الشروط والأحكام — نكسس" },
-      { property: "og:description", content: "الشروط والأحكام لاستخدام منصة نكسس وخدماتها." },
+      { title: "الشروط والأحكام — HN-Dev" },
+      { name: "description", content: "الشروط والأحكام لاستخدام منصة HN-Dev وخدماتها." },
+      { property: "og:title", content: "الشروط والأحكام — HN-Dev" },
+      { property: "og:description", content: "الشروط والأحكام لاستخدام منصة HN-Dev وخدماتها." },
     ],
   }),
   component: TermsPage,
@@ -25,7 +25,7 @@ function TermsPage() {
           <section>
             <h2 className="font-display text-xl font-semibold mb-3">1. القبول بالشروط</h2>
             <p>
-              باستخدامك لمنصة نكسس (&quot;الخدمة&quot;)، فإنك توافق على الالتزام بهذه الشروط
+              باستخدامك لمنصة HN-Dev (&quot;الخدمة&quot;)، فإنك توافق على الالتزام بهذه الشروط
               والأحكام. إذا لم توافق على أي جزء منها، يُرجى عدم استخدام الخدمة.
             </p>
           </section>
@@ -33,7 +33,7 @@ function TermsPage() {
           <section>
             <h2 className="font-display text-xl font-semibold mb-3">2. وصف الخدمة</h2>
             <p>
-              تقدّم نكسس منصة لإدارة ومراقبة المشاريع الرقمية، تشمل خططاً مدفوعة لمراقبة
+              تقدّم HN-Dev منصة لإدارة ومراقبة المشاريع الرقمية، تشمل خططاً مدفوعة لمراقبة
               المواقع، وسوقاً للقوالب الجاهزة، وخدمات تطوير مخصصة.
             </p>
           </section>
