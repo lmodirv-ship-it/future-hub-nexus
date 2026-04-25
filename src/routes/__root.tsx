@@ -1,11 +1,14 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
 import { NavBar } from "@/components/nexus/NavBar";
 import { Footer } from "@/components/nexus/Footer";
 import { AuroraBackground } from "@/components/nexus/AuroraBackground";
-import { I18nProvider } from "@/lib/i18n";
+import { CookieConsent } from "@/components/nexus/CookieConsent";
+import { I18nProvider, getLangFromPath, useI18n } from "@/lib/i18n";
 import { CurrencyProvider } from "@/lib/currency";
+import { organizationSchema, websiteSchema } from "@/lib/seo";
+import { useEffect } from "react";
 
 function NotFoundComponent() {
   return (
@@ -35,25 +38,12 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "HN-Dev — مركز التحكم لكل مشاريعك" },
-      { name: "description", content: "منصة زجاجية من المستقبل تجمع كل مشاريعك الرقمية في فضاء واحد." },
       { name: "author", content: "HN-Dev" },
-      { property: "og:title", content: "HN-Dev — مركز التحكم لكل مشاريعك" },
-      { property: "og:description", content: "منصة زجاجية من المستقبل تجمع كل مشاريعك الرقمية في فضاء واحد." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://www.slavacall-hiba.online/" },
-      { property: "og:site_name", content: "slavacall-hiba.online" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "HN-Dev — مركز التحكم لكل مشاريعك" },
-      { name: "twitter:description", content: "منصة زجاجية من المستقبل تجمع كل مشاريعك الرقمية في فضاء واحد." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/49391f56-cbde-4fc7-b51b-79b95eebc3ee/id-preview-8f8a00d5--6c0d65e5-805e-4e64-8a3b-4a6f2c47f81f.lovable.app-1776692597292.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/49391f56-cbde-4fc7-b51b-79b95eebc3ee/id-preview-8f8a00d5--6c0d65e5-805e-4e64-8a3b-4a6f2c47f81f.lovable.app-1776692597292.png" },
+      { property: "og:site_name", content: "HN-Dev" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
-      {
-        rel: "canonical",
-        href: "https://www.slavacall-hiba.online/",
-      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -69,6 +59,16 @@ export const Route = createRootRoute({
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700;900&display=swap",
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(organizationSchema()),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(websiteSchema()),
       },
     ],
   }),
@@ -95,13 +95,33 @@ function RootComponent() {
   return (
     <I18nProvider>
       <CurrencyProvider>
+        <HtmlLangSync />
         <AuroraBackground />
         <NavBar />
         <main className="relative">
           <Outlet />
         </main>
         <Footer />
+        <CookieConsent />
       </CurrencyProvider>
     </I18nProvider>
   );
+}
+
+/** Keeps <html lang> and <html dir> in sync with the URL/i18n state. */
+function HtmlLangSync() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { lang, setLang } = useI18n();
+  useEffect(() => {
+    const urlLang = getLangFromPath(pathname);
+    const seg = pathname.split("/")[1];
+    if ((seg === "en" || seg === "fr") && urlLang !== lang) {
+      setLang(urlLang);
+    }
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+    }
+  }, [pathname, lang, setLang]);
+  return null;
 }
