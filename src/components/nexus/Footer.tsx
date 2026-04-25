@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Sparkles } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import hnLogo from "@/assets/hn-groupe-logo.png";
 
 export function Footer() {
   const { t } = useI18n();
@@ -10,9 +10,7 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-4">
           <div>
             <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[oklch(0.75_0.2_295)] to-[oklch(0.7_0.28_330)]">
-                <Sparkles className="h-5 w-5 text-background" />
-              </div>
+              <img src={hnLogo} alt="HN-Groupe" className="h-9 w-9 rounded-xl object-cover" />
               <span className="font-display text-lg font-bold neon-text">HN-Dev</span>
             </Link>
             <p className="mt-3 text-sm text-muted-foreground">
