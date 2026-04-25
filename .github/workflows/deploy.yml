@@ -73,17 +73,28 @@ jobs:
             set -eo pipefail
             ts() { date -u +%H:%M:%S; }
 
-            cd ~/app
+            APP_DIR="/srv/hn-dev"
+            export PATH="$HOME/.bun/bin:/root/.bun/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+
+            cd "$APP_DIR"
             echo ">> [$(ts)] Pulling latest code from main..."
             git fetch origin main
             git reset --hard origin/main
 
-            echo ">> [$(ts)] Rebuilding and restarting containers..."
-            docker compose up -d --build
+            echo ">> [$(ts)] Installing dependencies (bun install)..."
+            bun install --frozen-lockfile || bun install
 
-            echo ">> [$(ts)] Cleaning up old images..."
-            docker image prune -f
+            echo ">> [$(ts)] Building production bundle (bun run build)..."
+            bun run build
 
-            echo ">> [$(ts)] ✅ Deployment complete. Current containers:"
-            docker compose ps
+            echo ">> [$(ts)] Restarting app via PM2..."
+            if pm2 describe hn-dev >/dev/null 2>&1; then
+              pm2 restart hn-dev --update-env
+            else
+              pm2 start "bun run start" --name hn-dev --cwd "$APP_DIR"
+            fi
+            pm2 save
+
+            echo ">> [$(ts)] ✅ Deployment complete. PM2 status:"
+            pm2 list
             REMOTE_SCRIPT
