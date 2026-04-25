@@ -8,7 +8,7 @@ import { useProjects } from "@/hooks/use-projects";
 import { useSettings } from "@/hooks/use-settings";
 
 export const Route = createFileRoute("/admin/settings")({
-  head: () => ({ meta: [{ title: "الإعدادات — نكسس" }] }),
+  head: () => ({ meta: [{ title: "الإعدادات — HN-Dev" }] }),
   component: () => (<AdminGuard><Page /></AdminGuard>),
 });
 
@@ -80,7 +80,7 @@ function Page() {
         </Card>
 
         <Card icon={SettingsIcon} title="النظام">
-          <Row label="الإصدار" value="نكسس v1.0" />
+          <Row label="الإصدار" value="HN-Dev v1.0" />
           <Row label="المنصة" value="TanStack + Lovable Cloud" />
           <Row label="الفحص التلقائي" value={`كل ${interval} دقيقة`} badge="cyan" />
         </Card>

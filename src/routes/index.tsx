@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { HeroNexus } from "@/components/nexus/HeroNexus";
+import { HeroHN-Dev } from "@/components/nexus/HeroHN-Dev";
 import { ProjectGrid } from "@/components/nexus/ProjectGrid";
 import { ArrowLeft } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
@@ -7,9 +7,9 @@ import { useI18n } from "@/lib/i18n";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "نكسس — مركز التحكم لكل مشاريعك" },
+      { title: "HN-Dev — مركز التحكم لكل مشاريعك" },
       { name: "description", content: "منصة زجاجية من المستقبل تجمع 14 مشروعاً رقمياً في فضاء واحد." },
-      { property: "og:title", content: "نكسس — كل مشاريعك في مكان واحد" },
+      { property: "og:title", content: "HN-Dev — كل مشاريعك في مكان واحد" },
       { property: "og:description", content: "AI، تجارة، عقارات، نقل، خدمات — كل شيء في منصة واحدة." },
     ],
   }),
@@ -20,7 +20,7 @@ function Index() {
   const { t } = useI18n();
   return (
     <>
-      <HeroNexus />
+      <HeroHN-Dev />
       <section className="relative mx-auto max-w-7xl px-6 py-20">
         <div className="mb-10 flex items-end justify-between">
           <div>

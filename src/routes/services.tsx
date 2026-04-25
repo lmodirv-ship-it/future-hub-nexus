@@ -8,9 +8,9 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/services")({
   head: () => ({
     meta: [
-      { title: "خدمات احترافية — نكسس" },
+      { title: "خدمات احترافية — HN-Dev" },
       { name: "description", content: "اطلب موقعاً مخصصاً، تطبيقاً، أو استشارة. تسليم بجودة عالية." },
-      { property: "og:title", content: "خدمات احترافية — نكسس" },
+      { property: "og:title", content: "خدمات احترافية — HN-Dev" },
       { property: "og:description", content: "Done-For-You: نبني لك مشروعك من الصفر." },
     ],
   }),

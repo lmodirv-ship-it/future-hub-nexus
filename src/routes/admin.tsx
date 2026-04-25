@@ -15,7 +15,7 @@ import { GLOW_MAP, getIcon, type GlowKey } from "@/lib/icon-map";
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "لوحة الإدارة — نكسس" },
+      { title: "لوحة الإدارة — HN-Dev" },
       { name: "description", content: "مركز قيادة متقدم لإدارة كل مشاريعك مع إحصائيات حية وتتبع الحالة." },
     ],
   }),

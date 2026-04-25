@@ -31,7 +31,7 @@ export function NavBar() {
             <Sparkles className="h-5 w-5 text-background" />
             <div className="absolute inset-0 rounded-xl blur-md opacity-60 bg-gradient-to-br from-[oklch(0.75_0.2_295)] to-[oklch(0.7_0.28_330)] -z-10" />
           </div>
-          <span className="font-display text-lg font-bold neon-text">نكسس</span>
+          <span className="font-display text-lg font-bold neon-text">HN-Dev</span>
         </Link>
         <ul className="hidden items-center gap-1 md:flex">
           {links.map((l) => (

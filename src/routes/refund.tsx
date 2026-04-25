@@ -3,10 +3,10 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/refund")({
   head: () => ({
     meta: [
-      { title: "سياسة الاسترداد — نكسس" },
-      { name: "description", content: "سياسة الاسترداد لاشتراكات نكسس وقوالب السوق." },
-      { property: "og:title", content: "سياسة الاسترداد — نكسس" },
-      { property: "og:description", content: "سياسة الاسترداد لاشتراكات نكسس وقوالب السوق." },
+      { title: "سياسة الاسترداد — HN-Dev" },
+      { name: "description", content: "سياسة الاسترداد لاشتراكات HN-Dev وقوالب السوق." },
+      { property: "og:title", content: "سياسة الاسترداد — HN-Dev" },
+      { property: "og:description", content: "سياسة الاسترداد لاشتراكات HN-Dev وقوالب السوق." },
     ],
   }),
   component: RefundPage,
@@ -26,7 +26,7 @@ function RefundPage() {
             <h2 className="font-display text-xl font-semibold mb-3">1. مبدأ عام</h2>
             <p>
               نسعى لرضاك التام. توضّح هذه السياسة متى يحق لك طلب استرداد المبلغ المدفوع
-              عبر منصة نكسس، والشروط والمدد المعتمدة. تُعالَج جميع المدفوعات وعمليات
+              عبر منصة HN-Dev، والشروط والمدد المعتمدة. تُعالَج جميع المدفوعات وعمليات
               الاسترداد عبر مزوّدنا الرسمي <strong>Paddle</strong>.
             </p>
           </section>

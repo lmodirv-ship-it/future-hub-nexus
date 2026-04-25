@@ -5,9 +5,9 @@ import { Mail, MessageSquare, Send, Sparkles } from "lucide-react";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "تواصل — نكسس" },
-      { name: "description", content: "تواصل مع فريق نكسس لأي استفسار أو تعاون." },
-      { property: "og:title", content: "تواصل معنا — نكسس" },
+      { title: "تواصل — HN-Dev" },
+      { name: "description", content: "تواصل مع فريق HN-Dev لأي استفسار أو تعاون." },
+      { property: "og:title", content: "تواصل معنا — HN-Dev" },
       { property: "og:description", content: "نحن هنا للإجابة على أسئلتك." },
     ],
   }),

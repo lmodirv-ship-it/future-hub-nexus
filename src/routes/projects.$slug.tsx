@@ -16,7 +16,7 @@ export const Route = createFileRoute("/projects/$slug")({
   },
   head: ({ loaderData, params }) => {
     const p = loaderData?.project;
-    const title = p ? `${p.name_ar ?? p.name} — نكسس` : `${params.slug} — نكسس`;
+    const title = p ? `${p.name_ar ?? p.name} — HN-Dev` : `${params.slug} — HN-Dev`;
     const desc = (p?.description_ar ?? p?.description ?? `تفاصيل مشروع ${params.slug}`).toString().slice(0, 160);
     return {
       meta: [

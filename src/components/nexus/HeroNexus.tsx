@@ -3,7 +3,7 @@ import { Sparkles, ArrowLeft, Layers } from "lucide-react";
 import { useProjects } from "@/hooks/use-projects";
 import { useI18n } from "@/lib/i18n";
 
-export function HeroNexus() {
+export function HeroHN-Dev() {
   const { projects } = useProjects();
   const count = projects.length || 14;
   const { t } = useI18n();

@@ -13,7 +13,7 @@ export function Footer() {
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[oklch(0.75_0.2_295)] to-[oklch(0.7_0.28_330)]">
                 <Sparkles className="h-5 w-5 text-background" />
               </div>
-              <span className="font-display text-lg font-bold neon-text">نكسس</span>
+              <span className="font-display text-lg font-bold neon-text">HN-Dev</span>
             </Link>
             <p className="mt-3 text-sm text-muted-foreground">
               {t("footer.tagline")}

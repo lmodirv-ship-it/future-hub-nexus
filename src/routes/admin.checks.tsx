@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { checkAllProjects } from "@/server/check-projects";
 
 export const Route = createFileRoute("/admin/checks")({
-  head: () => ({ meta: [{ title: "الفحوصات — نكسس" }] }),
+  head: () => ({ meta: [{ title: "الفحوصات — HN-Dev" }] }),
   component: () => (<AdminGuard><Page /></AdminGuard>),
 });
 

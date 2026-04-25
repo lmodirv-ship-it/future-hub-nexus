@@ -12,7 +12,7 @@ import { AddSiteModal, type AddSitePayload } from "@/components/admin/AddSiteMod
 export const Route = createFileRoute("/admin/control-center")({
   head: () => ({
     meta: [
-      { title: "مركز التحكم — نكسس" },
+      { title: "مركز التحكم — HN-Dev" },
       { name: "description", content: "إدارة مركزية لكل مواقعك من مكان واحد." },
     ],
   }),

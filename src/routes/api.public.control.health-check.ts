@@ -29,7 +29,7 @@ async function checkSite(domain: string): Promise<{
       method: "GET",
       redirect: "follow",
       signal: controller.signal,
-      headers: { "User-Agent": "NexusControlCenter/1.0" },
+      headers: { "User-Agent": "HN-DevControlCenter/1.0" },
     });
     clearTimeout(timer);
     const ms = Date.now() - start;
