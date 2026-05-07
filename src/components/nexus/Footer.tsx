@@ -7,7 +7,7 @@ export function Footer() {
   return (
     <footer className="relative mt-32 border-t border-white/10 pb-8 pt-16">
       <div className="mx-auto max-w-6xl px-6">
-        <div className="grid gap-10 md:grid-cols-4">
+        <div className="grid gap-10 md:grid-cols-5">
           <div>
             <Link to="/" className="flex items-center gap-2">
               <img src={hnLogo} alt="HN-Groupe" className="h-9 w-9 rounded-xl object-cover" />
@@ -29,7 +29,17 @@ export function Footer() {
             <h4 className="mb-3 font-display font-semibold">{t("footer.ecosystem")}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link to="/about" className="hover:text-foreground">{t("nav.about")}</Link></li>
+              <li><Link to="/about-hnchat" className="hover:text-foreground">About hnChat</Link></li>
               <li><Link to="/contact" className="hover:text-foreground">{t("nav.contact")}</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="mb-3 font-display font-semibold">Legal</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li><Link to="/privacy" className="hover:text-foreground">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="hover:text-foreground">Terms of Service</Link></li>
+              <li><Link to="/community-guidelines" className="hover:text-foreground">Community Guidelines</Link></li>
+              <li><Link to="/refund" className="hover:text-foreground">Refund Policy</Link></li>
             </ul>
           </div>
           <div>
