@@ -23,7 +23,9 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ControlCenterRouteImport } from './routes/control-center'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CommunityGuidelinesRouteImport } from './routes/community-guidelines'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AboutHnchatRouteImport } from './routes/about-hnchat'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectsSlugRouteImport } from './routes/projects.$slug'
@@ -111,9 +113,19 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CommunityGuidelinesRoute = CommunityGuidelinesRouteImport.update({
+  id: '/community-guidelines',
+  path: '/community-guidelines',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutHnchatRoute = AboutHnchatRouteImport.update({
+  id: '/about-hnchat',
+  path: '/about-hnchat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -203,7 +215,9 @@ const ApiPublicControlHealthCheckRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/about-hnchat': typeof AboutHnchatRoute
   '/admin': typeof AdminRouteWithChildren
+  '/community-guidelines': typeof CommunityGuidelinesRoute
   '/contact': typeof ContactRoute
   '/control-center': typeof ControlCenterRoute
   '/dashboard': typeof DashboardRoute
@@ -236,7 +250,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/about-hnchat': typeof AboutHnchatRoute
   '/admin': typeof AdminRouteWithChildren
+  '/community-guidelines': typeof CommunityGuidelinesRoute
   '/contact': typeof ContactRoute
   '/control-center': typeof ControlCenterRoute
   '/dashboard': typeof DashboardRoute
@@ -270,7 +286,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/about-hnchat': typeof AboutHnchatRoute
   '/admin': typeof AdminRouteWithChildren
+  '/community-guidelines': typeof CommunityGuidelinesRoute
   '/contact': typeof ContactRoute
   '/control-center': typeof ControlCenterRoute
   '/dashboard': typeof DashboardRoute
@@ -305,7 +323,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/about-hnchat'
     | '/admin'
+    | '/community-guidelines'
     | '/contact'
     | '/control-center'
     | '/dashboard'
@@ -338,7 +358,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/about-hnchat'
     | '/admin'
+    | '/community-guidelines'
     | '/contact'
     | '/control-center'
     | '/dashboard'
@@ -371,7 +393,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/about-hnchat'
     | '/admin'
+    | '/community-guidelines'
     | '/contact'
     | '/control-center'
     | '/dashboard'
@@ -405,7 +429,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AboutHnchatRoute: typeof AboutHnchatRoute
   AdminRoute: typeof AdminRouteWithChildren
+  CommunityGuidelinesRoute: typeof CommunityGuidelinesRoute
   ContactRoute: typeof ContactRoute
   ControlCenterRoute: typeof ControlCenterRoute
   DashboardRoute: typeof DashboardRoute
@@ -525,11 +551,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/community-guidelines': {
+      id: '/community-guidelines'
+      path: '/community-guidelines'
+      fullPath: '/community-guidelines'
+      preLoaderRoute: typeof CommunityGuidelinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about-hnchat': {
+      id: '/about-hnchat'
+      path: '/about-hnchat'
+      fullPath: '/about-hnchat'
+      preLoaderRoute: typeof AboutHnchatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -700,7 +740,9 @@ const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AboutHnchatRoute: AboutHnchatRoute,
   AdminRoute: AdminRouteWithChildren,
+  CommunityGuidelinesRoute: CommunityGuidelinesRoute,
   ContactRoute: ContactRoute,
   ControlCenterRoute: ControlCenterRoute,
   DashboardRoute: DashboardRoute,
@@ -722,3 +764,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
