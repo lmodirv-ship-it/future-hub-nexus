@@ -77,6 +77,72 @@ export type Database = {
           },
         ]
       }
+      blog_articles: {
+        Row: {
+          body_ar: string | null
+          body_en: string | null
+          body_fr: string | null
+          category: string
+          cover_image: string | null
+          created_at: string
+          excerpt_ar: string | null
+          excerpt_en: string | null
+          excerpt_fr: string | null
+          id: string
+          is_published: boolean
+          published_at: string | null
+          slug: string
+          sort_order: number
+          title_ar: string
+          title_en: string | null
+          title_fr: string | null
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          body_ar?: string | null
+          body_en?: string | null
+          body_fr?: string | null
+          category?: string
+          cover_image?: string | null
+          created_at?: string
+          excerpt_ar?: string | null
+          excerpt_en?: string | null
+          excerpt_fr?: string | null
+          id?: string
+          is_published?: boolean
+          published_at?: string | null
+          slug: string
+          sort_order?: number
+          title_ar: string
+          title_en?: string | null
+          title_fr?: string | null
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          body_ar?: string | null
+          body_en?: string | null
+          body_fr?: string | null
+          category?: string
+          cover_image?: string | null
+          created_at?: string
+          excerpt_ar?: string | null
+          excerpt_en?: string | null
+          excerpt_fr?: string | null
+          id?: string
+          is_published?: boolean
+          published_at?: string | null
+          slug?: string
+          sort_order?: number
+          title_ar?: string
+          title_en?: string | null
+          title_fr?: string | null
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
       cross_project_visits: {
         Row: {
           count: number
@@ -1010,6 +1076,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_article_view: { Args: { _slug: string }; Returns: undefined }
       is_admin: { Args: never; Returns: boolean }
       log_project_visit: { Args: { _project_id: string }; Returns: undefined }
       track_cross_visit: {
