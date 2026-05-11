@@ -8,7 +8,7 @@ function admin() {
   return createClient<Database>(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 
-function safeEqual(a: string, b: string) {
+function timingSafeEqualStr(a: string, b: string) {
   if (a.length !== b.length) return false;
   let m = 0;
   for (let i = 0; i < a.length; i++) m |= a.charCodeAt(i) ^ b.charCodeAt(i);
@@ -29,13 +29,14 @@ async function probe(url: string) {
 }
 
 async function handle(request: Request): Promise<Response> {
-  const expected = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.SUPABASE_ANON_KEY;
+  const expected = process.env.CRON_SECRET;
   if (!expected) {
-    console.error("anon key not configured");
+    console.error("CRON_SECRET not configured");
     return new Response(JSON.stringify({ ok: false, error: "Internal error" }), { status: 500, headers: { "Content-Type": "application/json" } });
   }
-  const apikey = request.headers.get("apikey") ?? "";
-  if (!apikey || !safeEqual(apikey, expected)) {
+  const header = request.headers.get("authorization") ?? "";
+  const token = header.startsWith("Bearer ") ? header.slice(7) : "";
+  if (!token || !timingSafeEqualStr(token, expected)) {
     return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json" } });
   }
   try {
