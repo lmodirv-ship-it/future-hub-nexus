@@ -1,133 +1,60 @@
+## الهدف
 
-# 🎛️ Central Control Hub داخل HN-Dev
+ربط جميع المواقع الـ20 بـ hnChat بحيث:
+1. **المواقع التي عندها blog** → تجلب مقالات hnChat وتعرضها (مدمجة مع مقالاتها).
+2. **المواقع التي ما عندها blog** → ننشئ صفحة `/blog` جديدة + زر "المدونة" في القائمة.
+3. **اختياري**: عند نشر مقال جديد في أي موقع، يُرسَل تلقائياً لـ hnChat باستخدام `HNCHAT_BLOG_SECRET`.
 
-## 🎯 الهدف
-تحويل HN-Dev إلى **لوحة تحكم عن بعد** لكل مشاريعك الـ 20 في Lovable، تعرض حالتها، نطاقاتها المخصّصة، وتوفّر "علبة أدوات AdSense" جاهزة للنسخ.
-
----
-
-## ⚠️ توضيح تقني مهم (قبل البدء)
-
-Lovable لا يوفّر API عام لتعديل ملفات مشاريع أخرى من داخل مشروع. يعني:
-- ✅ **ما يمكن فعله من HN-Dev**: عرض، تتبّع، فحص الحالة (HEAD requests)، تخزين النطاقات، توليد كود AdSense + ads.txt جاهز للنسخ.
-- ❌ **ما لا يمكن فعله تلقائياً**: حقن السكريبت أو ads.txt مباشرة في الـ 19 مشروع الآخر — يجب لصقه في كل مشروع مرّة واحدة (سأعطيك prompt جاهز ينسخ ويلصق فيُنفّذ التغيير في ثوانٍ).
+كل شيء **إضافي فقط** — لا حذف، لا تعديل لأي صفحة موجودة (التزام بقاعدة `mem://constraints/no-destructive-ops`).
 
 ---
 
-## 📐 خطة التنفيذ
+## الخطة
 
-### 1) جدول قاعدة بيانات جديد: `lovable_projects`
-يخزّن المشاريع الـ 20 + النطاقات المخصّصة لكل واحد + حالة AdSense.
+### 1. صفحة Toolkit مركزية في HN-Dev
+ملف جديد: `src/routes/admin.hnchat-kit.tsx` (مثل `adsense-kit`)
+يحتوي على:
+- **Snippet 1 — قارئ المقالات** (يُلصق في صفحة blog أو صفحة جديدة):
+  - مكوّن React يجلب من `https://hn-chat.com/api/public/articles` ويعرض البطاقات.
+- **Snippet 2 — صفحة blog كاملة** للمواقع التي ما عندها واحدة (route file جاهز للصق في `src/routes/blog.tsx`).
+- **Snippet 3 — رابط "المدونة"** للقائمة (`<Link to="/blog">المدونة</Link>`).
+- **Snippet 4 — ناشر تلقائي** (دالة `publishToHnChat()` تستدعي `POST /api/public/articles` مع الهيدر `x-blog-secret`).
+- **Prompt جاهز للصق في Lovable** بكل موقع: "أضف صفحة /blog فقط، لا تعدّل أي صفحة أخرى".
 
-| العمود | النوع | الوصف |
-|---|---|---|
-| `id` | uuid | PK |
-| `lovable_project_id` | text unique | معرّف Lovable |
-| `name` | text | اسم المشروع |
-| `description` | text | وصف قصير |
-| `lovable_url` | text | `*.lovable.app` |
-| `published_url` | text | URL المنشور |
-| `custom_domains` | jsonb | مصفوفة نطاقات مخصّصة `[{domain, primary, ssl_ok}]` |
-| `category` | text | تصنيف (saas/store/portfolio/tool…) |
-| `adsense_installed` | boolean | هل أُضيف السكريبت؟ |
-| `adstxt_installed` | boolean | هل أُضيف ads.txt؟ |
-| `last_health_check` | timestamptz | آخر فحص حالة |
-| `last_status_code` | int | كود الاستجابة |
-| `is_up` | bool | up/down |
-| `notes` | text | ملاحظات |
+جدول حالة لكل مشروع (من `lovable_projects`): هل عنده blog؟ هل تم تركيب الـ kit؟ — مع toggle يدوي.
 
-RLS: قراءة/كتابة للمدير فقط (`is_admin()`).
+### 2. حقول جديدة في `lovable_projects` (إضافية فقط)
+عبر migration:
+- `has_blog boolean default false`
+- `hnchat_kit_installed boolean default false`
 
-### 2) Seed تلقائي للمشاريع الـ 20
-Migration تُدخل القائمة كاملة (HN Chat Hub، HN Driver، AI Client Connect، AI Resume Genius، Smart Solutions Hub، Grand Tanger Print، CarWashManager، Souk-HN، Profitable Ventures، Agency Hub Pro، AI Scene Studio، Studio HN، Database Foundation، AI Studio Vision، hn-cima، HN-Dev، My Site Manager، Vigilant Guardian، Domain Monitor، Cloud Harmony) مع روابط `lovable.app` المعروفة + خانة فارغة للنطاقات المخصّصة لتعبئتها.
+### 3. سر `HNCHAT_BLOG_SECRET`
+نطلب من المستخدم إضافته عبر `add_secret` (لاستخدامه لاحقاً إذا أردنا proxy للنشر من HN-Dev، لكن الكود الفعلي للنشر سيعيش في كل موقع ويستخدم سرّه المحلي).
 
-### 3) صفحة جديدة: `/admin/control-hub`
-لوحة شبكة (grid) فيها بطاقة لكل مشروع تعرض:
-- الاسم + الوصف + التصنيف
-- حالة الموقع (🟢 up / 🔴 down / ⚪ unchecked) مع زمن الاستجابة
-- الـ subdomain الافتراضي + النطاقات المخصّصة
-- شارات AdSense + ads.txt (مُفعّل / لا)
-- أزرار سريعة: فتح، نسخ الرابط، تعديل النطاقات، إعادة فحص
-
-أعلى الصفحة: شريط إحصائيات (إجمالي المشاريع، المنشورة، أعلى مدّة استجابة، نطاقات مخصّصة، نسبة AdSense).
-
-### 4) Modal "إدارة النطاقات" لكل مشروع
-- إضافة/حذف نطاقات مخصّصة (text input + chip list).
-- علامة "Primary".
-- زر فحص (HEAD request عبر server function) يُحدّث `is_up` + `last_status_code`.
-- زر فتح إعدادات Lovable للمشروع (link to `/projects/{id}/settings/domains`).
-
-### 5) صفحة "AdSense Toolkit" (`/admin/adsense-kit`)
-كل ما يلزم لتفعيل AdSense على أي مشروع، مع:
-- **سكريبت AdSense** جاهز للنسخ:
-  ```html
-  <script async
-    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3443455318197857"
-    crossorigin="anonymous"></script>
-  ```
-- **محتوى ads.txt**:
-  ```
-  google.com, pub-3443455318197857, DIRECT, f08c47fec0942fa0
-  ```
-- **زرّ نسخ** بجانب كل قطعة.
-- **Prompt جاهز للصق في أي مشروع Lovable** (يُنفّذه الـ AI تلقائياً):
-  > "أضف سكريبت Google AdSense (`ca-pub-3443455318197857`) إلى الـ `<head>` في `__root.tsx`، وأنشئ ملف `public/ads.txt` يحتوي السطر: `google.com, pub-3443455318197857, DIRECT, f08c47fec0942fa0`."
-- جدول يعرض حالة كل مشروع (مُفعّل/لا) مع checkbox يحدّث الجدول بعد التفعيل اليدوي.
-
-### 6) ads.txt في HN-Dev نفسه
-إنشاء `public/ads.txt` يحوي السطر المطلوب → يُخدَم تلقائياً على `https://www.slavacall-hiba.online/ads.txt`.
-(السكريبت موجود فعلاً في `__root.tsx`).
-
-### 7) فحص جماعي (Bulk Health Check)
-زر "فحص الكل" في أعلى Control Hub يُشغّل server function تستدعي `HEAD` لكل URL منشور (لن تتعدّى 10s) وتحدّث الجدول دفعة واحدة.
-
-### 8) تنقل
-إضافة رابط "Control Hub" + "AdSense Kit" داخل قائمة `/admin` الجانبية.
+### 4. (اختياري لاحقاً) Auto-inject عبر GitHub
+زر في `/admin/github-sync` يضيف `src/routes/blog.tsx` للمشاريع التي `has_blog = false` — **بدون لمس** أي ملف موجود (يتحقق أولاً، ثم ينشئ فقط).
 
 ---
 
-## 🗂️ بنية الملفات المتوقّعة
+## ما لن نلمسه
 
-```
-src/
-  routes/
-    admin.control-hub.tsx          ← الشبكة + الإحصائيات
-    admin.adsense-kit.tsx          ← أدوات AdSense + ads.txt
-  components/admin/
-    ProjectControlCard.tsx
-    DomainManagerModal.tsx
-    AdsenseStatusTable.tsx
-    CopySnippet.tsx
-  server/
-    control-hub.ts                 ← bulk health check + CRUD
-public/
-  ads.txt                          ← google.com, pub-3443455318197857, ...
-supabase/migrations/
-  YYYYMMDD_lovable_projects.sql    ← جدول + RLS + seed للـ 20 مشروع
-```
+- لا تعديل لأي route موجود في أي موقع.
+- لا حذف أي ملف.
+- لا تغيير لـ `__root.tsx` أو navigation موجودة (نضيف فقط Link في snippet جاهز للنسخ).
 
 ---
 
-## 🎨 التصميم
-- يتبع الهوية الزجاجية الداكنة الحالية (glass-strong, neon-text, oklch tokens).
-- Grid 1 / 2 / 3 / 4 أعمدة حسب breakpoint.
-- شارات حالة ملوّنة (status pills).
-- أيقونات Lucide: `LayoutGrid`, `Globe`, `ShieldCheck`, `Activity`, `Copy`, `ExternalLink`.
+## الملفات الجديدة
+
+| ملف | غاية |
+|-----|------|
+| `supabase/migrations/<ts>_add_blog_flags.sql` | حقلين `has_blog` و `hnchat_kit_installed` |
+| `src/routes/admin.hnchat-kit.tsx` | صفحة Toolkit مع كل الـ snippets + جدول الحالة |
+| `src/components/admin/AdminLayout.tsx` (تحديث) | إضافة لينك "hnChat Kit" في الشريط الجانبي |
 
 ---
 
-## 📋 ما ستحصل عليه فور التنفيذ
-1. لوحة `/admin/control-hub` فيها كل مشاريعك الـ 20 مرتّبة كبطاقات.
-2. إمكانية إضافة نطاقاتك المخصّصة لكل مشروع (تُعبّأ مرّة واحدة).
-3. فحص حالة جميع المواقع بنقرة واحدة.
-4. صفحة `/admin/adsense-kit` تعطيك السكريبت + ads.txt + Prompt جاهز للصقه في الـ 19 مشروع لتفعيل AdSense دون كتابة كود.
-5. ملف `ads.txt` نشط على HN-Dev نفسه.
+## أسئلة قبل التنفيذ
 
----
-
-## 🛠️ خطوات ما بعد التنفيذ (يدوية لكن سريعة)
-لكل مشروع من الـ 19:
-1. افتح المشروع → الصق Prompt من AdSense Kit → ينفّذ Lovable AI الإضافة.
-2. ارجع لـ Control Hub → فعّل checkbox "AdSense Installed" للمشروع.
-خلال نصف ساعة تكون كل مشاريعك مُفعّلة على نفس حساب AdSense.
-
+1. **السر `HNCHAT_BLOG_SECRET`**: تريد إضافته الآن في HN-Dev؟ (سيُستخدم فقط إذا بنينا proxy لاحقاً). كل موقع يحتاج إضافته بنفسه أيضاً للنشر.
+2. **Auto-inject عبر GitHub**: نضيفها الآن أم نكتفي بالـ Toolkit للنسخ اليدوي في هذه الجولة؟
