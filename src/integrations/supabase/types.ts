@@ -77,6 +77,42 @@ export type Database = {
           },
         ]
       }
+      cross_project_visits: {
+        Row: {
+          count: number
+          country: string | null
+          created_at: string
+          id: string
+          lovable_project_id: string
+          path: string
+          referrer: string | null
+          updated_at: string
+          visit_date: string
+        }
+        Insert: {
+          count?: number
+          country?: string | null
+          created_at?: string
+          id?: string
+          lovable_project_id: string
+          path?: string
+          referrer?: string | null
+          updated_at?: string
+          visit_date?: string
+        }
+        Update: {
+          count?: number
+          country?: string | null
+          created_at?: string
+          id?: string
+          lovable_project_id?: string
+          path?: string
+          referrer?: string | null
+          updated_at?: string
+          visit_date?: string
+        }
+        Relationships: []
+      }
       lovable_projects: {
         Row: {
           adsense_installed: boolean
@@ -879,6 +915,15 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       log_project_visit: { Args: { _project_id: string }; Returns: undefined }
+      track_cross_visit: {
+        Args: {
+          _country?: string
+          _path: string
+          _project_id: string
+          _referrer?: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "viewer"

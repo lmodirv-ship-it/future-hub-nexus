@@ -36,14 +36,18 @@ import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminProjectsRouteImport } from './routes/admin.projects'
 import { Route as AdminManageRouteImport } from './routes/admin.manage'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
+import { Route as AdminGithubSyncRouteImport } from './routes/admin.github-sync'
 import { Route as AdminControlHubRouteImport } from './routes/admin.control-hub'
 import { Route as AdminControlCenterRouteImport } from './routes/admin.control-center'
 import { Route as AdminChecksRouteImport } from './routes/admin.checks'
+import { Route as AdminAnalyticsHubRouteImport } from './routes/admin.analytics-hub'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as AdminAdsenseKitRouteImport } from './routes/admin.adsense-kit'
 import { Route as ApiPublicCronCheckProjectsRouteImport } from './routes/api.public.cron.check-projects'
+import { Route as ApiPublicCronCheckLovableRouteImport } from './routes/api.public.cron.check-lovable'
 import { Route as ApiPublicControlSyncSiteRouteImport } from './routes/api.public.control.sync-site'
 import { Route as ApiPublicControlHealthCheckRouteImport } from './routes/api.public.control.health-check'
+import { Route as ApiPublicAnalyticsTrackRouteImport } from './routes/api.public.analytics.track'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -180,6 +184,11 @@ const AdminLeadsRoute = AdminLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminGithubSyncRoute = AdminGithubSyncRouteImport.update({
+  id: '/github-sync',
+  path: '/github-sync',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminControlHubRoute = AdminControlHubRouteImport.update({
   id: '/control-hub',
   path: '/control-hub',
@@ -193,6 +202,11 @@ const AdminControlCenterRoute = AdminControlCenterRouteImport.update({
 const AdminChecksRoute = AdminChecksRouteImport.update({
   id: '/checks',
   path: '/checks',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAnalyticsHubRoute = AdminAnalyticsHubRouteImport.update({
+  id: '/analytics-hub',
+  path: '/analytics-hub',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminAlertsRoute = AdminAlertsRouteImport.update({
@@ -211,6 +225,12 @@ const ApiPublicCronCheckProjectsRoute =
     path: '/api/public/cron/check-projects',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicCronCheckLovableRoute =
+  ApiPublicCronCheckLovableRouteImport.update({
+    id: '/api/public/cron/check-lovable',
+    path: '/api/public/cron/check-lovable',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicControlSyncSiteRoute =
   ApiPublicControlSyncSiteRouteImport.update({
     id: '/api/public/control/sync-site',
@@ -223,6 +243,11 @@ const ApiPublicControlHealthCheckRoute =
     path: '/api/public/control/health-check',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAnalyticsTrackRoute = ApiPublicAnalyticsTrackRouteImport.update({
+  id: '/api/public/analytics/track',
+  path: '/api/public/analytics/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -246,9 +271,11 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/admin/adsense-kit': typeof AdminAdsenseKitRoute
   '/admin/alerts': typeof AdminAlertsRoute
+  '/admin/analytics-hub': typeof AdminAnalyticsHubRoute
   '/admin/checks': typeof AdminChecksRoute
   '/admin/control-center': typeof AdminControlCenterRoute
   '/admin/control-hub': typeof AdminControlHubRoute
+  '/admin/github-sync': typeof AdminGithubSyncRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/projects': typeof AdminProjectsRoute
@@ -257,8 +284,10 @@ export interface FileRoutesByFullPath {
   '/admin/visits': typeof AdminVisitsRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/api/public/analytics/track': typeof ApiPublicAnalyticsTrackRoute
   '/api/public/control/health-check': typeof ApiPublicControlHealthCheckRoute
   '/api/public/control/sync-site': typeof ApiPublicControlSyncSiteRoute
+  '/api/public/cron/check-lovable': typeof ApiPublicCronCheckLovableRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
 export interface FileRoutesByTo {
@@ -283,9 +312,11 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/admin/adsense-kit': typeof AdminAdsenseKitRoute
   '/admin/alerts': typeof AdminAlertsRoute
+  '/admin/analytics-hub': typeof AdminAnalyticsHubRoute
   '/admin/checks': typeof AdminChecksRoute
   '/admin/control-center': typeof AdminControlCenterRoute
   '/admin/control-hub': typeof AdminControlHubRoute
+  '/admin/github-sync': typeof AdminGithubSyncRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/projects': typeof AdminProjectsRoute
@@ -294,8 +325,10 @@ export interface FileRoutesByTo {
   '/admin/visits': typeof AdminVisitsRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/api/public/analytics/track': typeof ApiPublicAnalyticsTrackRoute
   '/api/public/control/health-check': typeof ApiPublicControlHealthCheckRoute
   '/api/public/control/sync-site': typeof ApiPublicControlSyncSiteRoute
+  '/api/public/cron/check-lovable': typeof ApiPublicCronCheckLovableRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
 export interface FileRoutesById {
@@ -321,9 +354,11 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/admin/adsense-kit': typeof AdminAdsenseKitRoute
   '/admin/alerts': typeof AdminAlertsRoute
+  '/admin/analytics-hub': typeof AdminAnalyticsHubRoute
   '/admin/checks': typeof AdminChecksRoute
   '/admin/control-center': typeof AdminControlCenterRoute
   '/admin/control-hub': typeof AdminControlHubRoute
+  '/admin/github-sync': typeof AdminGithubSyncRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/projects': typeof AdminProjectsRoute
@@ -332,8 +367,10 @@ export interface FileRoutesById {
   '/admin/visits': typeof AdminVisitsRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/api/public/analytics/track': typeof ApiPublicAnalyticsTrackRoute
   '/api/public/control/health-check': typeof ApiPublicControlHealthCheckRoute
   '/api/public/control/sync-site': typeof ApiPublicControlSyncSiteRoute
+  '/api/public/cron/check-lovable': typeof ApiPublicCronCheckLovableRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
 export interface FileRouteTypes {
@@ -360,9 +397,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/adsense-kit'
     | '/admin/alerts'
+    | '/admin/analytics-hub'
     | '/admin/checks'
     | '/admin/control-center'
     | '/admin/control-hub'
+    | '/admin/github-sync'
     | '/admin/leads'
     | '/admin/manage'
     | '/admin/projects'
@@ -371,8 +410,10 @@ export interface FileRouteTypes {
     | '/admin/visits'
     | '/marketplace/$slug'
     | '/projects/$slug'
+    | '/api/public/analytics/track'
     | '/api/public/control/health-check'
     | '/api/public/control/sync-site'
+    | '/api/public/cron/check-lovable'
     | '/api/public/cron/check-projects'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -397,9 +438,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/adsense-kit'
     | '/admin/alerts'
+    | '/admin/analytics-hub'
     | '/admin/checks'
     | '/admin/control-center'
     | '/admin/control-hub'
+    | '/admin/github-sync'
     | '/admin/leads'
     | '/admin/manage'
     | '/admin/projects'
@@ -408,8 +451,10 @@ export interface FileRouteTypes {
     | '/admin/visits'
     | '/marketplace/$slug'
     | '/projects/$slug'
+    | '/api/public/analytics/track'
     | '/api/public/control/health-check'
     | '/api/public/control/sync-site'
+    | '/api/public/cron/check-lovable'
     | '/api/public/cron/check-projects'
   id:
     | '__root__'
@@ -434,9 +479,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/adsense-kit'
     | '/admin/alerts'
+    | '/admin/analytics-hub'
     | '/admin/checks'
     | '/admin/control-center'
     | '/admin/control-hub'
+    | '/admin/github-sync'
     | '/admin/leads'
     | '/admin/manage'
     | '/admin/projects'
@@ -445,8 +492,10 @@ export interface FileRouteTypes {
     | '/admin/visits'
     | '/marketplace/$slug'
     | '/projects/$slug'
+    | '/api/public/analytics/track'
     | '/api/public/control/health-check'
     | '/api/public/control/sync-site'
+    | '/api/public/cron/check-lovable'
     | '/api/public/cron/check-projects'
   fileRoutesById: FileRoutesById
 }
@@ -470,8 +519,10 @@ export interface RootRouteChildren {
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  ApiPublicAnalyticsTrackRoute: typeof ApiPublicAnalyticsTrackRoute
   ApiPublicControlHealthCheckRoute: typeof ApiPublicControlHealthCheckRoute
   ApiPublicControlSyncSiteRoute: typeof ApiPublicControlSyncSiteRoute
+  ApiPublicCronCheckLovableRoute: typeof ApiPublicCronCheckLovableRoute
   ApiPublicCronCheckProjectsRoute: typeof ApiPublicCronCheckProjectsRoute
 }
 
@@ -666,6 +717,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLeadsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/github-sync': {
+      id: '/admin/github-sync'
+      path: '/github-sync'
+      fullPath: '/admin/github-sync'
+      preLoaderRoute: typeof AdminGithubSyncRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/control-hub': {
       id: '/admin/control-hub'
       path: '/control-hub'
@@ -685,6 +743,13 @@ declare module '@tanstack/react-router' {
       path: '/checks'
       fullPath: '/admin/checks'
       preLoaderRoute: typeof AdminChecksRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/analytics-hub': {
+      id: '/admin/analytics-hub'
+      path: '/analytics-hub'
+      fullPath: '/admin/analytics-hub'
+      preLoaderRoute: typeof AdminAnalyticsHubRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/alerts': {
@@ -708,6 +773,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronCheckProjectsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/check-lovable': {
+      id: '/api/public/cron/check-lovable'
+      path: '/api/public/cron/check-lovable'
+      fullPath: '/api/public/cron/check-lovable'
+      preLoaderRoute: typeof ApiPublicCronCheckLovableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/control/sync-site': {
       id: '/api/public/control/sync-site'
       path: '/api/public/control/sync-site'
@@ -722,15 +794,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicControlHealthCheckRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/analytics/track': {
+      id: '/api/public/analytics/track'
+      path: '/api/public/analytics/track'
+      fullPath: '/api/public/analytics/track'
+      preLoaderRoute: typeof ApiPublicAnalyticsTrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AdminRouteChildren {
   AdminAdsenseKitRoute: typeof AdminAdsenseKitRoute
   AdminAlertsRoute: typeof AdminAlertsRoute
+  AdminAnalyticsHubRoute: typeof AdminAnalyticsHubRoute
   AdminChecksRoute: typeof AdminChecksRoute
   AdminControlCenterRoute: typeof AdminControlCenterRoute
   AdminControlHubRoute: typeof AdminControlHubRoute
+  AdminGithubSyncRoute: typeof AdminGithubSyncRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminManageRoute: typeof AdminManageRoute
   AdminProjectsRoute: typeof AdminProjectsRoute
@@ -742,9 +823,11 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAdsenseKitRoute: AdminAdsenseKitRoute,
   AdminAlertsRoute: AdminAlertsRoute,
+  AdminAnalyticsHubRoute: AdminAnalyticsHubRoute,
   AdminChecksRoute: AdminChecksRoute,
   AdminControlCenterRoute: AdminControlCenterRoute,
   AdminControlHubRoute: AdminControlHubRoute,
+  AdminGithubSyncRoute: AdminGithubSyncRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminManageRoute: AdminManageRoute,
   AdminProjectsRoute: AdminProjectsRoute,
@@ -799,8 +882,10 @@ const rootRouteChildren: RootRouteChildren = {
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  ApiPublicAnalyticsTrackRoute: ApiPublicAnalyticsTrackRoute,
   ApiPublicControlHealthCheckRoute: ApiPublicControlHealthCheckRoute,
   ApiPublicControlSyncSiteRoute: ApiPublicControlSyncSiteRoute,
+  ApiPublicCronCheckLovableRoute: ApiPublicCronCheckLovableRoute,
   ApiPublicCronCheckProjectsRoute: ApiPublicCronCheckProjectsRoute,
 }
 export const routeTree = rootRouteImport
