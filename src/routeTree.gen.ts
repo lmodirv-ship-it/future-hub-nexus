@@ -36,6 +36,7 @@ import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminProjectsRouteImport } from './routes/admin.projects'
 import { Route as AdminManageRouteImport } from './routes/admin.manage'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
+import { Route as AdminHnchatKitRouteImport } from './routes/admin.hnchat-kit'
 import { Route as AdminGithubSyncRouteImport } from './routes/admin.github-sync'
 import { Route as AdminControlHubRouteImport } from './routes/admin.control-hub'
 import { Route as AdminControlCenterRouteImport } from './routes/admin.control-center'
@@ -184,6 +185,11 @@ const AdminLeadsRoute = AdminLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminHnchatKitRoute = AdminHnchatKitRouteImport.update({
+  id: '/hnchat-kit',
+  path: '/hnchat-kit',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminGithubSyncRoute = AdminGithubSyncRouteImport.update({
   id: '/github-sync',
   path: '/github-sync',
@@ -276,6 +282,7 @@ export interface FileRoutesByFullPath {
   '/admin/control-center': typeof AdminControlCenterRoute
   '/admin/control-hub': typeof AdminControlHubRoute
   '/admin/github-sync': typeof AdminGithubSyncRoute
+  '/admin/hnchat-kit': typeof AdminHnchatKitRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/projects': typeof AdminProjectsRoute
@@ -317,6 +324,7 @@ export interface FileRoutesByTo {
   '/admin/control-center': typeof AdminControlCenterRoute
   '/admin/control-hub': typeof AdminControlHubRoute
   '/admin/github-sync': typeof AdminGithubSyncRoute
+  '/admin/hnchat-kit': typeof AdminHnchatKitRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/projects': typeof AdminProjectsRoute
@@ -359,6 +367,7 @@ export interface FileRoutesById {
   '/admin/control-center': typeof AdminControlCenterRoute
   '/admin/control-hub': typeof AdminControlHubRoute
   '/admin/github-sync': typeof AdminGithubSyncRoute
+  '/admin/hnchat-kit': typeof AdminHnchatKitRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/projects': typeof AdminProjectsRoute
@@ -402,6 +411,7 @@ export interface FileRouteTypes {
     | '/admin/control-center'
     | '/admin/control-hub'
     | '/admin/github-sync'
+    | '/admin/hnchat-kit'
     | '/admin/leads'
     | '/admin/manage'
     | '/admin/projects'
@@ -443,6 +453,7 @@ export interface FileRouteTypes {
     | '/admin/control-center'
     | '/admin/control-hub'
     | '/admin/github-sync'
+    | '/admin/hnchat-kit'
     | '/admin/leads'
     | '/admin/manage'
     | '/admin/projects'
@@ -484,6 +495,7 @@ export interface FileRouteTypes {
     | '/admin/control-center'
     | '/admin/control-hub'
     | '/admin/github-sync'
+    | '/admin/hnchat-kit'
     | '/admin/leads'
     | '/admin/manage'
     | '/admin/projects'
@@ -717,6 +729,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLeadsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/hnchat-kit': {
+      id: '/admin/hnchat-kit'
+      path: '/hnchat-kit'
+      fullPath: '/admin/hnchat-kit'
+      preLoaderRoute: typeof AdminHnchatKitRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/github-sync': {
       id: '/admin/github-sync'
       path: '/github-sync'
@@ -812,6 +831,7 @@ interface AdminRouteChildren {
   AdminControlCenterRoute: typeof AdminControlCenterRoute
   AdminControlHubRoute: typeof AdminControlHubRoute
   AdminGithubSyncRoute: typeof AdminGithubSyncRoute
+  AdminHnchatKitRoute: typeof AdminHnchatKitRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminManageRoute: typeof AdminManageRoute
   AdminProjectsRoute: typeof AdminProjectsRoute
@@ -828,6 +848,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminControlCenterRoute: AdminControlCenterRoute,
   AdminControlHubRoute: AdminControlHubRoute,
   AdminGithubSyncRoute: AdminGithubSyncRoute,
+  AdminHnchatKitRoute: AdminHnchatKitRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminManageRoute: AdminManageRoute,
   AdminProjectsRoute: AdminProjectsRoute,

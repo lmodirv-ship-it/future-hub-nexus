@@ -121,6 +121,8 @@ export type Database = {
           created_at: string
           custom_domains: Json
           description: string | null
+          has_blog: boolean
+          hnchat_kit_installed: boolean
           id: string
           is_up: boolean | null
           last_health_check: string | null
@@ -141,6 +143,8 @@ export type Database = {
           created_at?: string
           custom_domains?: Json
           description?: string | null
+          has_blog?: boolean
+          hnchat_kit_installed?: boolean
           id?: string
           is_up?: boolean | null
           last_health_check?: string | null
@@ -161,6 +165,8 @@ export type Database = {
           created_at?: string
           custom_domains?: Json
           description?: string | null
+          has_blog?: boolean
+          hnchat_kit_installed?: boolean
           id?: string
           is_up?: boolean | null
           last_health_check?: string | null
