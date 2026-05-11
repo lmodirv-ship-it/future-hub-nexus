@@ -401,6 +401,97 @@ export type Database = {
           },
         ]
       }
+      project_command_targets: {
+        Row: {
+          command_id: string
+          created_at: string
+          id: string
+          label: string | null
+          lovable_project_id: string | null
+          managed_site_id: string | null
+          notes: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          command_id: string
+          created_at?: string
+          id?: string
+          label?: string | null
+          lovable_project_id?: string | null
+          managed_site_id?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          command_id?: string
+          created_at?: string
+          id?: string
+          label?: string | null
+          lovable_project_id?: string | null
+          managed_site_id?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_command_targets_command_id_fkey"
+            columns: ["command_id"]
+            isOneToOne: false
+            referencedRelation: "project_commands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_command_targets_lovable_project_id_fkey"
+            columns: ["lovable_project_id"]
+            isOneToOne: false
+            referencedRelation: "lovable_projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_command_targets_managed_site_id_fkey"
+            columns: ["managed_site_id"]
+            isOneToOne: false
+            referencedRelation: "managed_sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_commands: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string | null
+          id: string
+          scope: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          scope?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          scope?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       project_visits: {
         Row: {
           count: number

@@ -34,6 +34,7 @@ import { Route as AdminVisitsRouteImport } from './routes/admin.visits'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminProjectsRouteImport } from './routes/admin.projects'
+import { Route as AdminProjectCommandsRouteImport } from './routes/admin.project-commands'
 import { Route as AdminManageRouteImport } from './routes/admin.manage'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as AdminHnchatKitRouteImport } from './routes/admin.hnchat-kit'
@@ -175,6 +176,11 @@ const AdminProjectsRoute = AdminProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminProjectCommandsRoute = AdminProjectCommandsRouteImport.update({
+  id: '/project-commands',
+  path: '/project-commands',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminManageRoute = AdminManageRouteImport.update({
   id: '/manage',
   path: '/manage',
@@ -285,6 +291,7 @@ export interface FileRoutesByFullPath {
   '/admin/hnchat-kit': typeof AdminHnchatKitRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/manage': typeof AdminManageRoute
+  '/admin/project-commands': typeof AdminProjectCommandsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -327,6 +334,7 @@ export interface FileRoutesByTo {
   '/admin/hnchat-kit': typeof AdminHnchatKitRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/manage': typeof AdminManageRoute
+  '/admin/project-commands': typeof AdminProjectCommandsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -370,6 +378,7 @@ export interface FileRoutesById {
   '/admin/hnchat-kit': typeof AdminHnchatKitRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/manage': typeof AdminManageRoute
+  '/admin/project-commands': typeof AdminProjectCommandsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -414,6 +423,7 @@ export interface FileRouteTypes {
     | '/admin/hnchat-kit'
     | '/admin/leads'
     | '/admin/manage'
+    | '/admin/project-commands'
     | '/admin/projects'
     | '/admin/seo'
     | '/admin/settings'
@@ -456,6 +466,7 @@ export interface FileRouteTypes {
     | '/admin/hnchat-kit'
     | '/admin/leads'
     | '/admin/manage'
+    | '/admin/project-commands'
     | '/admin/projects'
     | '/admin/seo'
     | '/admin/settings'
@@ -498,6 +509,7 @@ export interface FileRouteTypes {
     | '/admin/hnchat-kit'
     | '/admin/leads'
     | '/admin/manage'
+    | '/admin/project-commands'
     | '/admin/projects'
     | '/admin/seo'
     | '/admin/settings'
@@ -715,6 +727,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProjectsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/project-commands': {
+      id: '/admin/project-commands'
+      path: '/project-commands'
+      fullPath: '/admin/project-commands'
+      preLoaderRoute: typeof AdminProjectCommandsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/manage': {
       id: '/admin/manage'
       path: '/manage'
@@ -834,6 +853,7 @@ interface AdminRouteChildren {
   AdminHnchatKitRoute: typeof AdminHnchatKitRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminManageRoute: typeof AdminManageRoute
+  AdminProjectCommandsRoute: typeof AdminProjectCommandsRoute
   AdminProjectsRoute: typeof AdminProjectsRoute
   AdminSeoRoute: typeof AdminSeoRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -851,6 +871,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminHnchatKitRoute: AdminHnchatKitRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminManageRoute: AdminManageRoute,
+  AdminProjectCommandsRoute: AdminProjectCommandsRoute,
   AdminProjectsRoute: AdminProjectsRoute,
   AdminSeoRoute: AdminSeoRoute,
   AdminSettingsRoute: AdminSettingsRoute,
