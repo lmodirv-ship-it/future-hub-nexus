@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { authorizeAdminOrCron } from "@/server/control-auth";
 
 /**
  * يستدعي سيرفر المرايا لمزامنة موقع واحد (git pull/clone).
@@ -10,11 +11,13 @@ export const Route = createFileRoute("/api/public/control/sync-site")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const denied = await authorizeAdminOrCron(request);
+        if (denied) return denied;
         const MIRROR_URL = process.env.MIRROR_SERVER_URL;
         const TOKEN = process.env.CONTROL_API_TOKEN;
         if (!MIRROR_URL || !TOKEN) {
           return Response.json(
-            { error: "MIRROR_SERVER_URL أو CONTROL_API_TOKEN غير مهيّأ" },
+            { error: "Service not configured" },
             { status: 500 },
           );
         }
@@ -36,8 +39,9 @@ export const Route = createFileRoute("/api/public/control/sync-site")({
           .eq("id", body.siteId)
           .maybeSingle();
         if (siteErr || !site) {
+          if (siteErr) console.error("[sync-site] db error:", siteErr);
           return Response.json(
-            { error: siteErr?.message ?? "الموقع غير موجود" },
+            { error: "Site not found" },
             { status: 404 },
           );
         }
@@ -76,7 +80,8 @@ export const Route = createFileRoute("/api/public/control/sync-site")({
           httpOk = r.ok;
           syncRes = (await r.json().catch(() => ({}))) as typeof syncRes;
         } catch (e) {
-          syncRes = { ok: false, error: e instanceof Error ? e.message : "fetch failed" };
+          console.error("[sync-site] mirror fetch failed:", e);
+          syncRes = { ok: false, error: "Sync request failed" };
         }
 
         const status = httpOk && syncRes.ok ? "success" : "failed";
@@ -108,7 +113,7 @@ export const Route = createFileRoute("/api/public/control/sync-site")({
             status,
             commit: syncRes.commit,
             duration_ms: duration,
-            error: syncRes.error,
+            error: status === "success" ? undefined : "Sync failed",
           },
           { status: status === "success" ? 200 : 502 },
         );

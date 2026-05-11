@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { authorizeAdminOrCron } from "@/server/control-auth";
 
 /**
  * Health check endpoint for managed sites.
@@ -96,26 +97,26 @@ async function runChecks() {
 export const Route = createFileRoute("/api/public/control/health-check")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const denied = await authorizeAdminOrCron(request);
+        if (denied) return denied;
         try {
           const result = await runChecks();
           return Response.json({ ok: true, ...result });
         } catch (e) {
-          return Response.json(
-            { ok: false, error: e instanceof Error ? e.message : "unknown" },
-            { status: 500 },
-          );
+          console.error("[health-check]", e);
+          return Response.json({ ok: false, error: "Internal error" }, { status: 500 });
         }
       },
-      GET: async () => {
+      GET: async ({ request }) => {
+        const denied = await authorizeAdminOrCron(request);
+        if (denied) return denied;
         try {
           const result = await runChecks();
           return Response.json({ ok: true, ...result });
         } catch (e) {
-          return Response.json(
-            { ok: false, error: e instanceof Error ? e.message : "unknown" },
-            { status: 500 },
-          );
+          console.error("[health-check]", e);
+          return Response.json({ ok: false, error: "Internal error" }, { status: 500 });
         }
       },
     },
