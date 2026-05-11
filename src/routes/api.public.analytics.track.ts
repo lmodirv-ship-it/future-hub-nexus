@@ -26,11 +26,11 @@ export const Route = createFileRoute("/api/public/analytics/track")({
           const body = await request.json().catch(() => ({}));
           const project_id = String(body?.project_id ?? "").trim().slice(0, 100);
           const path = String(body?.path ?? "/").trim().slice(0, 500) || "/";
-          const referrer = body?.referrer ? String(body.referrer).slice(0, 500) : null;
+          const referrer = body?.referrer ? String(body.referrer).slice(0, 500) : undefined;
           const country =
             request.headers.get("cf-ipcountry")?.slice(0, 4) ??
             request.headers.get("x-vercel-ip-country")?.slice(0, 4) ??
-            null;
+            undefined;
           if (!project_id) {
             return new Response(JSON.stringify({ ok: false, error: "missing project_id" }), { status: 400, headers: corsHeaders() });
           }

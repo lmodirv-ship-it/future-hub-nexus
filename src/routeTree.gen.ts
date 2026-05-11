@@ -42,8 +42,10 @@ import { Route as AdminChecksRouteImport } from './routes/admin.checks'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as AdminAdsenseKitRouteImport } from './routes/admin.adsense-kit'
 import { Route as ApiPublicCronCheckProjectsRouteImport } from './routes/api.public.cron.check-projects'
+import { Route as ApiPublicCronCheckLovableRouteImport } from './routes/api.public.cron.check-lovable'
 import { Route as ApiPublicControlSyncSiteRouteImport } from './routes/api.public.control.sync-site'
 import { Route as ApiPublicControlHealthCheckRouteImport } from './routes/api.public.control.health-check'
+import { Route as ApiPublicAnalyticsTrackRouteImport } from './routes/api.public.analytics.track'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -211,6 +213,12 @@ const ApiPublicCronCheckProjectsRoute =
     path: '/api/public/cron/check-projects',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicCronCheckLovableRoute =
+  ApiPublicCronCheckLovableRouteImport.update({
+    id: '/api/public/cron/check-lovable',
+    path: '/api/public/cron/check-lovable',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicControlSyncSiteRoute =
   ApiPublicControlSyncSiteRouteImport.update({
     id: '/api/public/control/sync-site',
@@ -223,6 +231,11 @@ const ApiPublicControlHealthCheckRoute =
     path: '/api/public/control/health-check',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAnalyticsTrackRoute = ApiPublicAnalyticsTrackRouteImport.update({
+  id: '/api/public/analytics/track',
+  path: '/api/public/analytics/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -257,8 +270,10 @@ export interface FileRoutesByFullPath {
   '/admin/visits': typeof AdminVisitsRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/api/public/analytics/track': typeof ApiPublicAnalyticsTrackRoute
   '/api/public/control/health-check': typeof ApiPublicControlHealthCheckRoute
   '/api/public/control/sync-site': typeof ApiPublicControlSyncSiteRoute
+  '/api/public/cron/check-lovable': typeof ApiPublicCronCheckLovableRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
 export interface FileRoutesByTo {
@@ -294,8 +309,10 @@ export interface FileRoutesByTo {
   '/admin/visits': typeof AdminVisitsRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/api/public/analytics/track': typeof ApiPublicAnalyticsTrackRoute
   '/api/public/control/health-check': typeof ApiPublicControlHealthCheckRoute
   '/api/public/control/sync-site': typeof ApiPublicControlSyncSiteRoute
+  '/api/public/cron/check-lovable': typeof ApiPublicCronCheckLovableRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
 export interface FileRoutesById {
@@ -332,8 +349,10 @@ export interface FileRoutesById {
   '/admin/visits': typeof AdminVisitsRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
+  '/api/public/analytics/track': typeof ApiPublicAnalyticsTrackRoute
   '/api/public/control/health-check': typeof ApiPublicControlHealthCheckRoute
   '/api/public/control/sync-site': typeof ApiPublicControlSyncSiteRoute
+  '/api/public/cron/check-lovable': typeof ApiPublicCronCheckLovableRoute
   '/api/public/cron/check-projects': typeof ApiPublicCronCheckProjectsRoute
 }
 export interface FileRouteTypes {
@@ -371,8 +390,10 @@ export interface FileRouteTypes {
     | '/admin/visits'
     | '/marketplace/$slug'
     | '/projects/$slug'
+    | '/api/public/analytics/track'
     | '/api/public/control/health-check'
     | '/api/public/control/sync-site'
+    | '/api/public/cron/check-lovable'
     | '/api/public/cron/check-projects'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -408,8 +429,10 @@ export interface FileRouteTypes {
     | '/admin/visits'
     | '/marketplace/$slug'
     | '/projects/$slug'
+    | '/api/public/analytics/track'
     | '/api/public/control/health-check'
     | '/api/public/control/sync-site'
+    | '/api/public/cron/check-lovable'
     | '/api/public/cron/check-projects'
   id:
     | '__root__'
@@ -445,8 +468,10 @@ export interface FileRouteTypes {
     | '/admin/visits'
     | '/marketplace/$slug'
     | '/projects/$slug'
+    | '/api/public/analytics/track'
     | '/api/public/control/health-check'
     | '/api/public/control/sync-site'
+    | '/api/public/cron/check-lovable'
     | '/api/public/cron/check-projects'
   fileRoutesById: FileRoutesById
 }
@@ -470,8 +495,10 @@ export interface RootRouteChildren {
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  ApiPublicAnalyticsTrackRoute: typeof ApiPublicAnalyticsTrackRoute
   ApiPublicControlHealthCheckRoute: typeof ApiPublicControlHealthCheckRoute
   ApiPublicControlSyncSiteRoute: typeof ApiPublicControlSyncSiteRoute
+  ApiPublicCronCheckLovableRoute: typeof ApiPublicCronCheckLovableRoute
   ApiPublicCronCheckProjectsRoute: typeof ApiPublicCronCheckProjectsRoute
 }
 
@@ -708,6 +735,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronCheckProjectsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/check-lovable': {
+      id: '/api/public/cron/check-lovable'
+      path: '/api/public/cron/check-lovable'
+      fullPath: '/api/public/cron/check-lovable'
+      preLoaderRoute: typeof ApiPublicCronCheckLovableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/control/sync-site': {
       id: '/api/public/control/sync-site'
       path: '/api/public/control/sync-site'
@@ -720,6 +754,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/control/health-check'
       fullPath: '/api/public/control/health-check'
       preLoaderRoute: typeof ApiPublicControlHealthCheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/analytics/track': {
+      id: '/api/public/analytics/track'
+      path: '/api/public/analytics/track'
+      fullPath: '/api/public/analytics/track'
+      preLoaderRoute: typeof ApiPublicAnalyticsTrackRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -799,8 +840,10 @@ const rootRouteChildren: RootRouteChildren = {
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  ApiPublicAnalyticsTrackRoute: ApiPublicAnalyticsTrackRoute,
   ApiPublicControlHealthCheckRoute: ApiPublicControlHealthCheckRoute,
   ApiPublicControlSyncSiteRoute: ApiPublicControlSyncSiteRoute,
+  ApiPublicCronCheckLovableRoute: ApiPublicCronCheckLovableRoute,
   ApiPublicCronCheckProjectsRoute: ApiPublicCronCheckProjectsRoute,
 }
 export const routeTree = rootRouteImport

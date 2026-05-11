@@ -155,10 +155,12 @@ export const installAdSense = createServerFn({ method: "POST" })
 
     // 3. Mark in lovable_projects
     const sb = admin();
-    await sb.from("lovable_projects").update({
-      adsense_installed: results.adsense_script?.includes("injected") || results.adsense_script?.includes("already") || false,
-      adstxt_installed: true,
-    }).eq("notes", `repo:${data.repo}`).then(() => undefined).catch(() => undefined);
+    try {
+      await sb.from("lovable_projects").update({
+        adsense_installed: !!(results.adsense_script?.includes("injected") || results.adsense_script?.includes("already")),
+        adstxt_installed: true,
+      } as never).eq("notes", `repo:${data.repo}`);
+    } catch { /* noop */ }
 
     return { ok: true, results };
   });
