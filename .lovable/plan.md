@@ -1,223 +1,133 @@
-# 🌍 خطة تحويل HN-Dev إلى منصة عالمية متعددة اللغات
 
-## القرارات المعتمدة
-- **اللغات:** العربية (ar) + الإنجليزية (en) + الفرنسية (fr)
-- **بنية URL:** منفصلة لكل لغة (`/en/services`, `/ar/services`, `/fr/services`)
-- **اللغة الافتراضية:** العربية على المسار العاري (`/services` ≡ `/ar/services`)
-- **العملة:** تلقائية حسب اللغة (AR→MAD, EN→USD, FR→EUR) مع إمكانية التبديل اليدوي
-- **اتجاه النص:** RTL للعربية، LTR للإنجليزية والفرنسية
+# 🎛️ Central Control Hub داخل HN-Dev
+
+## 🎯 الهدف
+تحويل HN-Dev إلى **لوحة تحكم عن بعد** لكل مشاريعك الـ 20 في Lovable، تعرض حالتها، نطاقاتها المخصّصة، وتوفّر "علبة أدوات AdSense" جاهزة للنسخ.
 
 ---
 
-## المرحلة 1: توسيع نظام الـ i18n الأساسي
+## ⚠️ توضيح تقني مهم (قبل البدء)
 
-### `src/lib/i18n.tsx` (تحديث رئيسي)
-- إضافة `fr` إلى نوع `Lang`
-- توسيع القاموس بـ ~200 مفتاح ترجمة جديد يغطي جميع الصفحات
-- إضافة دالة `getLangFromPath(pathname)` لقراءة اللغة من URL
-- إضافة دالة `stripLangFromPath(pathname)` لإزالة بادئة اللغة
-- إضافة دالة `buildLangPath(lang, path)` لبناء روابط
-- كاشف لغة المتصفح عند أول زيارة (`navigator.language`)
-- حفظ التفضيل في `cookie` (وليس localStorage فقط) لتمكين قراءته من السيرفر
-- تحديث `<html lang>` و `dir` تلقائياً عند تغيير اللغة
-
-### إنشاء `src/lib/i18n-locales/` (تنظيم القاموس)
-- `ar.ts` — كل النصوص العربية
-- `en.ts` — كل النصوص الإنجليزية
-- `fr.ts` — كل النصوص الفرنسية
-- يبقى `i18n.tsx` نظيفاً ويستورد من هذه الملفات
+Lovable لا يوفّر API عام لتعديل ملفات مشاريع أخرى من داخل مشروع. يعني:
+- ✅ **ما يمكن فعله من HN-Dev**: عرض، تتبّع، فحص الحالة (HEAD requests)، تخزين النطاقات، توليد كود AdSense + ads.txt جاهز للنسخ.
+- ❌ **ما لا يمكن فعله تلقائياً**: حقن السكريبت أو ads.txt مباشرة في الـ 19 مشروع الآخر — يجب لصقه في كل مشروع مرّة واحدة (سأعطيك prompt جاهز ينسخ ويلصق فيُنفّذ التغيير في ثوانٍ).
 
 ---
 
-## المرحلة 2: ترجمة كاملة لجميع الصفحات
+## 📐 خطة التنفيذ
 
-تحويل النصوص العربية المكتوبة مباشرة إلى مفاتيح `t("...")`:
+### 1) جدول قاعدة بيانات جديد: `lovable_projects`
+يخزّن المشاريع الـ 20 + النطاقات المخصّصة لكل واحد + حالة AdSense.
 
-| الملف | تقدير المفاتيح |
-|---|---|
-| `src/routes/contact.tsx` | ~12 |
-| `src/routes/about.tsx` | ~15 |
-| `src/routes/services.tsx` | ~25 (يدعم `lang` فقط حالياً) |
-| `src/routes/projects.tsx` | ~10 |
-| `src/routes/projects.$slug.tsx` | ~15 |
-| `src/routes/pricing.tsx` | ~25 |
-| `src/routes/marketplace.tsx` | ~15 |
-| `src/routes/marketplace.$slug.tsx` | ~15 |
-| `src/routes/login.tsx` | ~10 |
-| `src/routes/privacy.tsx` | ~20 |
-| `src/routes/terms.tsx` | ~20 |
-| `src/routes/refund.tsx` | ~15 |
-| `src/components/nexus/HeroNexus.tsx` | ~8 |
-| `src/components/nexus/Footer.tsx` | تحديث (موجود جزئياً) |
+| العمود | النوع | الوصف |
+|---|---|---|
+| `id` | uuid | PK |
+| `lovable_project_id` | text unique | معرّف Lovable |
+| `name` | text | اسم المشروع |
+| `description` | text | وصف قصير |
+| `lovable_url` | text | `*.lovable.app` |
+| `published_url` | text | URL المنشور |
+| `custom_domains` | jsonb | مصفوفة نطاقات مخصّصة `[{domain, primary, ssl_ok}]` |
+| `category` | text | تصنيف (saas/store/portfolio/tool…) |
+| `adsense_installed` | boolean | هل أُضيف السكريبت؟ |
+| `adstxt_installed` | boolean | هل أُضيف ads.txt؟ |
+| `last_health_check` | timestamptz | آخر فحص حالة |
+| `last_status_code` | int | كود الاستجابة |
+| `is_up` | bool | up/down |
+| `notes` | text | ملاحظات |
 
-> ملاحظة: صفحات الإدارة (`admin.*`) تبقى عربية فقط لأنها داخلية.
+RLS: قراءة/كتابة للمدير فقط (`is_admin()`).
+
+### 2) Seed تلقائي للمشاريع الـ 20
+Migration تُدخل القائمة كاملة (HN Chat Hub، HN Driver، AI Client Connect، AI Resume Genius، Smart Solutions Hub، Grand Tanger Print، CarWashManager، Souk-HN، Profitable Ventures، Agency Hub Pro، AI Scene Studio، Studio HN، Database Foundation، AI Studio Vision، hn-cima، HN-Dev، My Site Manager، Vigilant Guardian، Domain Monitor، Cloud Harmony) مع روابط `lovable.app` المعروفة + خانة فارغة للنطاقات المخصّصة لتعبئتها.
+
+### 3) صفحة جديدة: `/admin/control-hub`
+لوحة شبكة (grid) فيها بطاقة لكل مشروع تعرض:
+- الاسم + الوصف + التصنيف
+- حالة الموقع (🟢 up / 🔴 down / ⚪ unchecked) مع زمن الاستجابة
+- الـ subdomain الافتراضي + النطاقات المخصّصة
+- شارات AdSense + ads.txt (مُفعّل / لا)
+- أزرار سريعة: فتح، نسخ الرابط، تعديل النطاقات، إعادة فحص
+
+أعلى الصفحة: شريط إحصائيات (إجمالي المشاريع، المنشورة، أعلى مدّة استجابة، نطاقات مخصّصة، نسبة AdSense).
+
+### 4) Modal "إدارة النطاقات" لكل مشروع
+- إضافة/حذف نطاقات مخصّصة (text input + chip list).
+- علامة "Primary".
+- زر فحص (HEAD request عبر server function) يُحدّث `is_up` + `last_status_code`.
+- زر فتح إعدادات Lovable للمشروع (link to `/projects/{id}/settings/domains`).
+
+### 5) صفحة "AdSense Toolkit" (`/admin/adsense-kit`)
+كل ما يلزم لتفعيل AdSense على أي مشروع، مع:
+- **سكريبت AdSense** جاهز للنسخ:
+  ```html
+  <script async
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3443455318197857"
+    crossorigin="anonymous"></script>
+  ```
+- **محتوى ads.txt**:
+  ```
+  google.com, pub-3443455318197857, DIRECT, f08c47fec0942fa0
+  ```
+- **زرّ نسخ** بجانب كل قطعة.
+- **Prompt جاهز للصق في أي مشروع Lovable** (يُنفّذه الـ AI تلقائياً):
+  > "أضف سكريبت Google AdSense (`ca-pub-3443455318197857`) إلى الـ `<head>` في `__root.tsx`، وأنشئ ملف `public/ads.txt` يحتوي السطر: `google.com, pub-3443455318197857, DIRECT, f08c47fec0942fa0`."
+- جدول يعرض حالة كل مشروع (مُفعّل/لا) مع checkbox يحدّث الجدول بعد التفعيل اليدوي.
+
+### 6) ads.txt في HN-Dev نفسه
+إنشاء `public/ads.txt` يحوي السطر المطلوب → يُخدَم تلقائياً على `https://www.slavacall-hiba.online/ads.txt`.
+(السكريبت موجود فعلاً في `__root.tsx`).
+
+### 7) فحص جماعي (Bulk Health Check)
+زر "فحص الكل" في أعلى Control Hub يُشغّل server function تستدعي `HEAD` لكل URL منشور (لن تتعدّى 10s) وتحدّث الجدول دفعة واحدة.
+
+### 8) تنقل
+إضافة رابط "Control Hub" + "AdSense Kit" داخل قائمة `/admin` الجانبية.
 
 ---
 
-## المرحلة 3: بنية الـ Routing الجديدة
+## 🗂️ بنية الملفات المتوقّعة
 
-### الإستراتيجية: Layout Route مع بادئة اللغة
-
-نضيف ملف `src/routes/$lang.tsx` كـ layout route، ولكن **بدون نقل ملفات** — بدلاً من ذلك:
-
-**الطريقة المعتمدة (أبسط وأكثر أماناً):**
-- إبقاء جميع المسارات الحالية كما هي (`/services`, `/about`, …)
-- إضافة layout اختياري `src/routes/$lang.tsx` يحتوي فقط على Outlet
-- إضافة ملفات pass-through تحت `src/routes/$lang/` تعيد التصدير من المسارات الأصلية:
-  - `src/routes/$lang/services.tsx` → يستورد ويعرض نفس مكوّن `services.tsx`
-  - وهكذا لباقي الصفحات العامة (about, contact, pricing, services, marketplace, projects, privacy, terms, refund)
-- داخل layout `$lang`، نتحقق إن كانت `lang` ∈ {en, fr}؛ إن لم تكن، نوجّه إلى 404
-- نتعامل مع `/ar/...` كإعادة توجيه إلى المسار العاري (`/...`) لتجنب المحتوى المكرر
-- كل ملف pass-through يستدعي `setLang()` المناسب من خلال loader
-
-> **تنبيه حول `routeTree.gen.ts`:** هذا الملف يُولَّد تلقائياً، لذلك لن نلمسه. ملفات المسارات الجديدة في `src/routes/$lang/` ستُسجَّل تلقائياً.
-
-### الصفحات التي ستحصل على نسخ بلغة:
-- `/en/`, `/fr/` (الرئيسية)
-- `/en/services`, `/fr/services`
-- `/en/about`, `/fr/about`
-- `/en/contact`, `/fr/contact`
-- `/en/pricing`, `/fr/pricing`
-- `/en/projects`, `/fr/projects`
-- `/en/projects/$slug`, `/fr/projects/$slug`
-- `/en/marketplace`, `/fr/marketplace`
-- `/en/marketplace/$slug`, `/fr/marketplace/$slug`
-- `/en/privacy`, `/fr/privacy`
-- `/en/terms`, `/fr/terms`
-- `/en/refund`, `/fr/refund`
-
-### المسارات التي **لن** تتغير (تبقى عربية فقط):
-- `/admin/*` (داخلي)
-- `/dashboard`, `/login`, `/monitor`, `/control-center` (وظيفية)
-- `/api/*` (APIs)
-
----
-
-## المرحلة 4: SEO عالمي (الأهم)
-
-### أ. `src/routes/__root.tsx` — تحديثات
-- إزالة الميتا الثابتة (`og:title`, `og:description` الحالية) لأنها بالعربية فقط
-- إبقاء فقط الميتا الفنية (charSet, viewport, fonts)
-- إضافة Schema.org Organization كـ JSON-LD ثابت
-- جعل `<html lang>` و `dir` ديناميكية حسب اللغة الحالية في URL
-
-### ب. كل route يحدد ميتا بلغته
-كل صفحة في `src/routes/$lang/services.tsx` ستضع ميتا حسب `params.lang`:
-```tsx
-head: ({ params }) => ({
-  meta: [
-    { title: titles[params.lang] },
-    { name: "description", content: descriptions[params.lang] },
-    { property: "og:title", content: titles[params.lang] },
-    ...
-  ],
-  links: [
-    { rel: "canonical", href: `https://www.slavacall-hiba.online/${params.lang}/services` },
-    { rel: "alternate", hreflang: "ar", href: ".../services" },
-    { rel: "alternate", hreflang: "en", href: ".../en/services" },
-    { rel: "alternate", hreflang: "fr", href: ".../fr/services" },
-    { rel: "alternate", hreflang: "x-default", href: ".../services" },
-  ],
-})
+```
+src/
+  routes/
+    admin.control-hub.tsx          ← الشبكة + الإحصائيات
+    admin.adsense-kit.tsx          ← أدوات AdSense + ads.txt
+  components/admin/
+    ProjectControlCard.tsx
+    DomainManagerModal.tsx
+    AdsenseStatusTable.tsx
+    CopySnippet.tsx
+  server/
+    control-hub.ts                 ← bulk health check + CRUD
+public/
+  ads.txt                          ← google.com, pub-3443455318197857, ...
+supabase/migrations/
+  YYYYMMDD_lovable_projects.sql    ← جدول + RLS + seed للـ 20 مشروع
 ```
 
-### ج. مساعد مشترك `src/lib/seo.ts`
-- دالة `buildHreflangLinks(path)` لتوليد روابط hreflang لأي صفحة
-- دالة `buildCanonical(lang, path)` لتوليد canonical
-- دالة `buildOrganizationSchema()` لإرجاع JSON-LD ثابت
-- دالة `buildWebSiteSchema()` مع SearchAction
+---
 
-### د. تحديث `src/routes/sitemap[.]xml.ts`
-- توليد URL لكل لغة لكل صفحة
-- استخدام `xhtml:link rel="alternate"` لكل URL لربطه بنسخه الأخرى:
-```xml
-<url>
-  <loc>https://.../en/services</loc>
-  <xhtml:link rel="alternate" hreflang="ar" href="https://.../services"/>
-  <xhtml:link rel="alternate" hreflang="en" href="https://.../en/services"/>
-  <xhtml:link rel="alternate" hreflang="fr" href="https://.../fr/services"/>
-  <xhtml:link rel="alternate" hreflang="x-default" href="https://.../services"/>
-</url>
-```
-- إضافة `xmlns:xhtml="http://www.w3.org/1999/xhtml"` إلى عنصر urlset
+## 🎨 التصميم
+- يتبع الهوية الزجاجية الداكنة الحالية (glass-strong, neon-text, oklch tokens).
+- Grid 1 / 2 / 3 / 4 أعمدة حسب breakpoint.
+- شارات حالة ملوّنة (status pills).
+- أيقونات Lucide: `LayoutGrid`, `Globe`, `ShieldCheck`, `Activity`, `Copy`, `ExternalLink`.
 
 ---
 
-## المرحلة 5: محوّل اللغة في NavBar
-
-### `src/components/nexus/NavBar.tsx`
-- استبدال زر AR/EN الحالي بقائمة منسدلة (`DropdownMenu`) بثلاث لغات:
-  - 🇲🇦 العربية
-  - 🇬🇧 English
-  - 🇫🇷 Français
-- عند التبديل: حساب المسار الجديد `buildLangPath(newLang, currentStrippedPath)` والتنقل إليه عبر `useNavigate`
-- جميع الـ `<Link>` في NavBar/Footer تستخدم المسار حسب اللغة الحالية
-
-### `src/components/nexus/Footer.tsx`
-- ترجمة أي نصوص متبقية
-- روابط الفوتر تتبع اللغة الحالية
+## 📋 ما ستحصل عليه فور التنفيذ
+1. لوحة `/admin/control-hub` فيها كل مشاريعك الـ 20 مرتّبة كبطاقات.
+2. إمكانية إضافة نطاقاتك المخصّصة لكل مشروع (تُعبّأ مرّة واحدة).
+3. فحص حالة جميع المواقع بنقرة واحدة.
+4. صفحة `/admin/adsense-kit` تعطيك السكريبت + ads.txt + Prompt جاهز للصقه في الـ 19 مشروع لتفعيل AdSense دون كتابة كود.
+5. ملف `ads.txt` نشط على HN-Dev نفسه.
 
 ---
 
-## المرحلة 6: العملة التلقائية حسب اللغة
-
-### `src/lib/currency.tsx` — تحديث
-- إضافة `useEffect` يراقب تغير اللغة
-- عند تغيّر اللغة لأول مرة (والمستخدم لم يختر عملة يدوياً)، تتغير العملة:
-  - `ar` → MAD
-  - `en` → USD
-  - `fr` → EUR
-- إذا غيّر المستخدم العملة يدوياً، نحفظ ذلك ولا نعيد التغيير تلقائياً (flag في localStorage)
-
----
-
-## المرحلة 7: إضافات عالمية أساسية
-
-### أ. Cookie Consent Banner (GDPR)
-- إنشاء `src/components/nexus/CookieConsent.tsx`
-- يظهر مرة واحدة عند أول زيارة، يحفظ الموافقة في cookie
-- مترجم بـ 3 لغات
-- يضاف داخل `__root.tsx`
-
-### ب. تحديث `src/routes/robots[.]txt.ts`
-- إضافة سطر `Sitemap:` يشير للنطاق الرسمي (موجود بالفعل، نتأكد فقط)
-
-### ج. ملف `.well-known/` — اختياري
-- لا نضيفه الآن، يمكن لاحقاً عند الحاجة
-
----
-
-## ⚠️ مخاطر ونقاط حذر
-
-1. **`routeTree.gen.ts` يُولَّد تلقائياً** — لن نلمسه، لكن ملفات المسارات الجديدة قد تحتاج جولة dev واحدة لإعادة التوليد.
-2. **Layout route `$lang`** قد يتعارض مع المسارات الموجودة. سنستخدم regex/validation داخل الـ loader لضمان قبول `en` و `fr` فقط.
-3. **حجم القاموس** سيكبر — تنظيمه في ملفات منفصلة تحت `src/lib/i18n-locales/` يحل ذلك.
-4. **صفحات `/admin/*`** ستبقى بدون تدويل (داخلية فقط).
-5. **روابط قديمة في الـ sitemap وفي النشرات الخارجية** ستبقى تعمل لأن العربية على المسار العاري.
-
----
-
-## 📊 الترتيب الزمني للتنفيذ
-
-1. ✅ توسيع `i18n.tsx` + إنشاء ملفات الترجمة الثلاثة
-2. ✅ ترجمة الصفحات الموجودة (استبدال النصوص بـ `t(...)`)
-3. ✅ إنشاء مساعد `src/lib/seo.ts`
-4. ✅ إنشاء `$lang` layout + ملفات pass-through
-5. ✅ تحديث NavBar بقائمة اللغات + Footer
-6. ✅ تحديث sitemap.xml للغات المتعددة
-7. ✅ ربط العملة باللغة
-8. ✅ Cookie Consent Banner
-9. ✅ اختبار يدوي لكل صفحة بكل لغة
-
----
-
-## 🎯 النتيجة المتوقعة
-
-- ✅ موقع متاح بالكامل بـ 3 لغات
-- ✅ Google يفهرس 3 نسخ من كل صفحة (ar/en/fr) مع hreflang صحيح
-- ✅ مشاركات السوشيال ميديا تظهر بلغة الزائر
-- ✅ Schema.org يحسّن ظهور الموقع في نتائج البحث الغنية
-- ✅ زائر فرنسي يرى السعر بـ EUR، أمريكي بـ USD، مغربي بـ MAD
-- ✅ امتثال GDPR الأساسي عبر Cookie Consent
-- ✅ تجربة عالمية احترافية تنافس Apple/Microsoft في البنية
+## 🛠️ خطوات ما بعد التنفيذ (يدوية لكن سريعة)
+لكل مشروع من الـ 19:
+1. افتح المشروع → الصق Prompt من AdSense Kit → ينفّذ Lovable AI الإضافة.
+2. ارجع لـ Control Hub → فعّل checkbox "AdSense Installed" للمشروع.
+خلال نصف ساعة تكون كل مشاريعك مُفعّلة على نفس حساب AdSense.
 

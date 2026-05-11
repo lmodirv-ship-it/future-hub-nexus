@@ -77,6 +77,69 @@ export type Database = {
           },
         ]
       }
+      lovable_projects: {
+        Row: {
+          adsense_installed: boolean
+          adstxt_installed: boolean
+          category: string
+          created_at: string
+          custom_domains: Json
+          description: string | null
+          id: string
+          is_up: boolean | null
+          last_health_check: string | null
+          last_response_time_ms: number | null
+          last_status_code: number | null
+          lovable_project_id: string
+          lovable_url: string | null
+          name: string
+          notes: string | null
+          published_url: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          adsense_installed?: boolean
+          adstxt_installed?: boolean
+          category?: string
+          created_at?: string
+          custom_domains?: Json
+          description?: string | null
+          id?: string
+          is_up?: boolean | null
+          last_health_check?: string | null
+          last_response_time_ms?: number | null
+          last_status_code?: number | null
+          lovable_project_id: string
+          lovable_url?: string | null
+          name: string
+          notes?: string | null
+          published_url?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          adsense_installed?: boolean
+          adstxt_installed?: boolean
+          category?: string
+          created_at?: string
+          custom_domains?: Json
+          description?: string | null
+          id?: string
+          is_up?: boolean | null
+          last_health_check?: string | null
+          last_response_time_ms?: number | null
+          last_status_code?: number | null
+          lovable_project_id?: string
+          lovable_url?: string | null
+          name?: string
+          notes?: string | null
+          published_url?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       managed_sites: {
         Row: {
           created_at: string

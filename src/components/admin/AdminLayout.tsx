@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { useLocation, Link } from "@tanstack/react-router";
 import {
   LayoutDashboard, FolderKanban, Activity, Eye, Bell, Settings,
-  Menu, X, ExternalLink, LogOut, Home, Radar, Crown, Search,
+  Menu, X, ExternalLink, LogOut, Home, Radar, Crown, Search, LayoutGrid, DollarSign,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -11,6 +11,8 @@ import { useProjects } from "@/hooks/use-projects";
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
 const NAV: NavItem[] = [
   { to: "/admin", label: "نظرة عامة", icon: LayoutDashboard, exact: true },
+  { to: "/admin/control-hub", label: "Control Hub", icon: LayoutGrid },
+  { to: "/admin/adsense-kit", label: "AdSense Kit", icon: DollarSign },
   { to: "/admin/projects", label: "المشاريع", icon: FolderKanban },
   { to: "/admin/manage", label: "الإدارة الشاملة", icon: Crown },
   { to: "/admin/control-center", label: "مركز التحكم", icon: Radar },
