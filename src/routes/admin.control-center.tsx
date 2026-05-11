@@ -8,6 +8,7 @@ import { AdminGuard } from "@/components/nexus/AdminGuard";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useManagedSites, type ManagedSite } from "@/hooks/use-managed-sites";
 import { AddSiteModal, type AddSitePayload } from "@/components/admin/AddSiteModal";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin/control-center")({
   head: () => ({
