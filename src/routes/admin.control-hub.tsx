@@ -92,7 +92,7 @@ function ControlHub() {
   }
 
   async function toggleFlag(id: string, field: "adsense_installed" | "adstxt_installed", value: boolean) {
-    await supabase.from("lovable_projects").update({ [field]: value }).eq("id", id);
+    await supabase.from("lovable_projects").update({ [field]: value } as never).eq("id", id);
     setRows((prev) => prev.map((r) => r.id === id ? { ...r, [field]: value } : r));
   }
 
