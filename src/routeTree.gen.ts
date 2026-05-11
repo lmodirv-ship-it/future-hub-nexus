@@ -36,9 +36,11 @@ import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminProjectsRouteImport } from './routes/admin.projects'
 import { Route as AdminManageRouteImport } from './routes/admin.manage'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
+import { Route as AdminGithubSyncRouteImport } from './routes/admin.github-sync'
 import { Route as AdminControlHubRouteImport } from './routes/admin.control-hub'
 import { Route as AdminControlCenterRouteImport } from './routes/admin.control-center'
 import { Route as AdminChecksRouteImport } from './routes/admin.checks'
+import { Route as AdminAnalyticsHubRouteImport } from './routes/admin.analytics-hub'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as AdminAdsenseKitRouteImport } from './routes/admin.adsense-kit'
 import { Route as ApiPublicCronCheckProjectsRouteImport } from './routes/api.public.cron.check-projects'
@@ -182,6 +184,11 @@ const AdminLeadsRoute = AdminLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminGithubSyncRoute = AdminGithubSyncRouteImport.update({
+  id: '/github-sync',
+  path: '/github-sync',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminControlHubRoute = AdminControlHubRouteImport.update({
   id: '/control-hub',
   path: '/control-hub',
@@ -195,6 +202,11 @@ const AdminControlCenterRoute = AdminControlCenterRouteImport.update({
 const AdminChecksRoute = AdminChecksRouteImport.update({
   id: '/checks',
   path: '/checks',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAnalyticsHubRoute = AdminAnalyticsHubRouteImport.update({
+  id: '/analytics-hub',
+  path: '/analytics-hub',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminAlertsRoute = AdminAlertsRouteImport.update({
@@ -259,9 +271,11 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/admin/adsense-kit': typeof AdminAdsenseKitRoute
   '/admin/alerts': typeof AdminAlertsRoute
+  '/admin/analytics-hub': typeof AdminAnalyticsHubRoute
   '/admin/checks': typeof AdminChecksRoute
   '/admin/control-center': typeof AdminControlCenterRoute
   '/admin/control-hub': typeof AdminControlHubRoute
+  '/admin/github-sync': typeof AdminGithubSyncRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/projects': typeof AdminProjectsRoute
@@ -298,9 +312,11 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/admin/adsense-kit': typeof AdminAdsenseKitRoute
   '/admin/alerts': typeof AdminAlertsRoute
+  '/admin/analytics-hub': typeof AdminAnalyticsHubRoute
   '/admin/checks': typeof AdminChecksRoute
   '/admin/control-center': typeof AdminControlCenterRoute
   '/admin/control-hub': typeof AdminControlHubRoute
+  '/admin/github-sync': typeof AdminGithubSyncRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/projects': typeof AdminProjectsRoute
@@ -338,9 +354,11 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/admin/adsense-kit': typeof AdminAdsenseKitRoute
   '/admin/alerts': typeof AdminAlertsRoute
+  '/admin/analytics-hub': typeof AdminAnalyticsHubRoute
   '/admin/checks': typeof AdminChecksRoute
   '/admin/control-center': typeof AdminControlCenterRoute
   '/admin/control-hub': typeof AdminControlHubRoute
+  '/admin/github-sync': typeof AdminGithubSyncRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/projects': typeof AdminProjectsRoute
@@ -379,9 +397,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/adsense-kit'
     | '/admin/alerts'
+    | '/admin/analytics-hub'
     | '/admin/checks'
     | '/admin/control-center'
     | '/admin/control-hub'
+    | '/admin/github-sync'
     | '/admin/leads'
     | '/admin/manage'
     | '/admin/projects'
@@ -418,9 +438,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/adsense-kit'
     | '/admin/alerts'
+    | '/admin/analytics-hub'
     | '/admin/checks'
     | '/admin/control-center'
     | '/admin/control-hub'
+    | '/admin/github-sync'
     | '/admin/leads'
     | '/admin/manage'
     | '/admin/projects'
@@ -457,9 +479,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/adsense-kit'
     | '/admin/alerts'
+    | '/admin/analytics-hub'
     | '/admin/checks'
     | '/admin/control-center'
     | '/admin/control-hub'
+    | '/admin/github-sync'
     | '/admin/leads'
     | '/admin/manage'
     | '/admin/projects'
@@ -693,6 +717,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLeadsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/github-sync': {
+      id: '/admin/github-sync'
+      path: '/github-sync'
+      fullPath: '/admin/github-sync'
+      preLoaderRoute: typeof AdminGithubSyncRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/control-hub': {
       id: '/admin/control-hub'
       path: '/control-hub'
@@ -712,6 +743,13 @@ declare module '@tanstack/react-router' {
       path: '/checks'
       fullPath: '/admin/checks'
       preLoaderRoute: typeof AdminChecksRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/analytics-hub': {
+      id: '/admin/analytics-hub'
+      path: '/analytics-hub'
+      fullPath: '/admin/analytics-hub'
+      preLoaderRoute: typeof AdminAnalyticsHubRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/alerts': {
@@ -769,9 +807,11 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAdsenseKitRoute: typeof AdminAdsenseKitRoute
   AdminAlertsRoute: typeof AdminAlertsRoute
+  AdminAnalyticsHubRoute: typeof AdminAnalyticsHubRoute
   AdminChecksRoute: typeof AdminChecksRoute
   AdminControlCenterRoute: typeof AdminControlCenterRoute
   AdminControlHubRoute: typeof AdminControlHubRoute
+  AdminGithubSyncRoute: typeof AdminGithubSyncRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminManageRoute: typeof AdminManageRoute
   AdminProjectsRoute: typeof AdminProjectsRoute
@@ -783,9 +823,11 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAdsenseKitRoute: AdminAdsenseKitRoute,
   AdminAlertsRoute: AdminAlertsRoute,
+  AdminAnalyticsHubRoute: AdminAnalyticsHubRoute,
   AdminChecksRoute: AdminChecksRoute,
   AdminControlCenterRoute: AdminControlCenterRoute,
   AdminControlHubRoute: AdminControlHubRoute,
+  AdminGithubSyncRoute: AdminGithubSyncRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminManageRoute: AdminManageRoute,
   AdminProjectsRoute: AdminProjectsRoute,
