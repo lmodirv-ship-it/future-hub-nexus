@@ -10,6 +10,7 @@ export type Dict = {
   "nav.contact": string;
   "nav.pricing": string;
   "nav.marketplace": string;
+  "nav.blog": string;
   "nav.login": string;
   "nav.logout": string;
   "nav.menu": string;
