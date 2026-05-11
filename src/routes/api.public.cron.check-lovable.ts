@@ -29,14 +29,13 @@ async function probe(url: string) {
 }
 
 async function handle(request: Request): Promise<Response> {
-  const expected = process.env.CONTROL_API_TOKEN;
+  const expected = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.SUPABASE_ANON_KEY;
   if (!expected) {
-    console.error("CONTROL_API_TOKEN not configured");
+    console.error("anon key not configured");
     return new Response(JSON.stringify({ ok: false, error: "Internal error" }), { status: 500, headers: { "Content-Type": "application/json" } });
   }
-  const auth = request.headers.get("authorization") ?? "";
-  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
-  if (!token || !safeEqual(token, expected)) {
+  const apikey = request.headers.get("apikey") ?? "";
+  if (!apikey || !safeEqual(apikey, expected)) {
     return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json" } });
   }
   try {
