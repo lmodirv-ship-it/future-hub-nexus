@@ -15,6 +15,8 @@ export function useIsAdmin() {
       return;
     }
     let cancelled = false;
+    setLoading(true);
+    setIsAdmin(null);
     supabase.rpc("is_admin").then(({ data, error }) => {
       if (cancelled) return;
       setIsAdmin(!error && !!data);
