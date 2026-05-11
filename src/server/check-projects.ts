@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 function getAdminClient() {
   const url = process.env.SUPABASE_URL ?? import.meta.env.VITE_SUPABASE_URL;
@@ -11,6 +12,17 @@ function getAdminClient() {
   return createClient<Database>(url, serviceKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
+}
+
+async function ensureAdmin(sb: ReturnType<typeof getAdminClient>, userId: string) {
+  const { data, error } = await sb
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "admin")
+    .maybeSingle();
+  if (error) throw new Error("forbidden");
+  if (!data) throw new Error("forbidden: admin role required");
 }
 
 async function probe(url: string): Promise<{ ok: boolean; status: number | null; ms: number; err: string | null }> {
@@ -27,8 +39,11 @@ async function probe(url: string): Promise<{ ok: boolean; status: number | null;
   }
 }
 
-export const checkAllProjects = createServerFn({ method: "POST" }).handler(async () => {
-  const admin = getAdminClient();
+export const checkAllProjects = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const admin = getAdminClient();
+    await ensureAdmin(admin, context.userId);
   const { data: projects, error } = await admin.from("projects").select("id, url");
   if (error) throw new Error(error.message);
 
