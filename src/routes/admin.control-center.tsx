@@ -63,7 +63,13 @@ function ControlCenterPage() {
     setBusy(true);
     flash("جارِ فحص كل المواقع...");
     try {
-      const res = await fetch("/api/public/control/health-check", { method: "POST" });
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch("/api/public/control/health-check", {
+        method: "POST",
+        headers: session?.access_token
+          ? { Authorization: `Bearer ${session.access_token}` }
+          : {},
+      });
       const json = await res.json();
       if (res.ok) {
         flash(`✓ تم فحص ${json.checked ?? 0} موقع`);
@@ -167,9 +173,13 @@ function ControlCenterPage() {
               onSync={async () => {
                 flash(`جارِ مزامنة "${site.name}"...`);
                 try {
+                  const { data: { session } } = await supabase.auth.getSession();
                   const res = await fetch("/api/public/control/sync-site", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {
+                      "Content-Type": "application/json",
+                      ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+                    },
                     body: JSON.stringify({ siteId: site.id }),
                   });
                   const json = await res.json();
