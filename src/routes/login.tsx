@@ -4,7 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsAdmin } from "@/hooks/use-is-admin";
-import { Sparkles, LogIn, ShieldCheck } from "lucide-react";
+import { Sparkles, LogIn, ShieldCheck, ExternalLink } from "lucide-react";
+
+const PUBLISHED_URL = "https://future-hub-nexus.lovable.app/login";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -22,6 +24,15 @@ function LoginPage() {
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showFallback, setShowFallback] = useState(false);
+
+  // Detect if we're inside the Lovable preview iframe — Google OAuth often
+  // gets blocked there by third-party cookie/iframe policies.
+  const inPreview =
+    typeof window !== "undefined" &&
+    (window.location.hostname.includes("lovableproject.com") ||
+      window.location.hostname.includes("lovable.app") === false ||
+      window !== window.top);
 
   useEffect(() => {
     if (loading || !user) return;
@@ -36,12 +47,21 @@ function LoginPage() {
   async function handleGoogle() {
     setBusy(true);
     setError(null);
+    setShowFallback(false);
+    // Safety net: if Google doesn't take over the page within 6s,
+    // restore the button and show the fallback link.
+    const timer = window.setTimeout(() => {
+      setBusy(false);
+      setShowFallback(true);
+    }, 6000);
     const res = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin + "/login",
     });
     if (res.error) {
+      window.clearTimeout(timer);
       setError(res.error.message);
       setBusy(false);
+      setShowFallback(true);
     }
   }
 
@@ -71,6 +91,18 @@ function LoginPage() {
           <p className="mt-4 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
             {error}
           </p>
+        )}
+
+        {(showFallback || inPreview) && (
+          <a
+            href={PUBLISHED_URL}
+            target="_top"
+            rel="noopener noreferrer"
+            className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-xs font-medium text-foreground hover:bg-white/10"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            إذا لم يفتح Google هنا، سجّل الدخول من الموقع المنشور
+          </a>
         )}
 
         <p className="mt-6 flex items-center justify-center gap-1 text-[11px] text-muted-foreground">
