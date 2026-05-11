@@ -40,6 +40,7 @@ import { Route as AdminControlHubRouteImport } from './routes/admin.control-hub'
 import { Route as AdminControlCenterRouteImport } from './routes/admin.control-center'
 import { Route as AdminChecksRouteImport } from './routes/admin.checks'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
+import { Route as AdminAdsenseKitRouteImport } from './routes/admin.adsense-kit'
 import { Route as ApiPublicCronCheckProjectsRouteImport } from './routes/api.public.cron.check-projects'
 import { Route as ApiPublicControlSyncSiteRouteImport } from './routes/api.public.control.sync-site'
 import { Route as ApiPublicControlHealthCheckRouteImport } from './routes/api.public.control.health-check'
@@ -199,6 +200,11 @@ const AdminAlertsRoute = AdminAlertsRouteImport.update({
   path: '/alerts',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAdsenseKitRoute = AdminAdsenseKitRouteImport.update({
+  id: '/adsense-kit',
+  path: '/adsense-kit',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ApiPublicCronCheckProjectsRoute =
   ApiPublicCronCheckProjectsRouteImport.update({
     id: '/api/public/cron/check-projects',
@@ -238,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/admin/adsense-kit': typeof AdminAdsenseKitRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
   '/admin/control-center': typeof AdminControlCenterRoute
@@ -274,6 +281,7 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/admin/adsense-kit': typeof AdminAdsenseKitRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
   '/admin/control-center': typeof AdminControlCenterRoute
@@ -311,6 +319,7 @@ export interface FileRoutesById {
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/admin/adsense-kit': typeof AdminAdsenseKitRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/checks': typeof AdminChecksRoute
   '/admin/control-center': typeof AdminControlCenterRoute
@@ -349,6 +358,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/sitemap.xml'
     | '/terms'
+    | '/admin/adsense-kit'
     | '/admin/alerts'
     | '/admin/checks'
     | '/admin/control-center'
@@ -385,6 +395,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/sitemap.xml'
     | '/terms'
+    | '/admin/adsense-kit'
     | '/admin/alerts'
     | '/admin/checks'
     | '/admin/control-center'
@@ -421,6 +432,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/sitemap.xml'
     | '/terms'
+    | '/admin/adsense-kit'
     | '/admin/alerts'
     | '/admin/checks'
     | '/admin/control-center'
@@ -682,6 +694,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAlertsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/adsense-kit': {
+      id: '/admin/adsense-kit'
+      path: '/adsense-kit'
+      fullPath: '/admin/adsense-kit'
+      preLoaderRoute: typeof AdminAdsenseKitRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/api/public/cron/check-projects': {
       id: '/api/public/cron/check-projects'
       path: '/api/public/cron/check-projects'
@@ -707,6 +726,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminAdsenseKitRoute: typeof AdminAdsenseKitRoute
   AdminAlertsRoute: typeof AdminAlertsRoute
   AdminChecksRoute: typeof AdminChecksRoute
   AdminControlCenterRoute: typeof AdminControlCenterRoute
@@ -720,6 +740,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAdsenseKitRoute: AdminAdsenseKitRoute,
   AdminAlertsRoute: AdminAlertsRoute,
   AdminChecksRoute: AdminChecksRoute,
   AdminControlCenterRoute: AdminControlCenterRoute,
